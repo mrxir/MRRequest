@@ -1,0 +1,1 @@
+../../../MRFramework/Classes/Foundation-Extension/NSObject+Extension.h
