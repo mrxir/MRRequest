@@ -70,6 +70,8 @@
         MRRequestParameter *parameter = [[MRRequestParameter alloc] initWithObject:self.loginInfo];
         
         parameter.requestScope = MRRequestParameterRequestScopeRequestAccessToken;
+        parameter.requestMethod = MRRequestParameterRequestMethodPost;
+        parameter.formattedStyle = MRRequestParameterFormattedStyleForm;
         
         MRRequest *request = [[MRRequest alloc] initWithPath:self.serverAddressField.text parameter:parameter delegate:nil];
         [request resume];

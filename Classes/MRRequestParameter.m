@@ -115,14 +115,14 @@
             }
             
             if (self.requestScope == MRRequestParameterRequestScopeRequestAccessToken) {
-                oAuthDynamicParameter[@"client_id"]      = @"-client_id-";
-                oAuthDynamicParameter[@"client_secret"]  = @"-client_secret-";
+                oAuthDynamicParameter[@"client_id"]      = @"ff2ff059d245ae8cb378ab54a92e966d";
+                oAuthDynamicParameter[@"client_secret"]  = @"01f32ac28d7b45e08932f11a958f1d9f";
                 oAuthDynamicParameter[@"grant_type"]     = @"password";
             }
             
             if (self.requestScope == MRRequestParameterRequestScopeRefreshAccessToken) {
-                oAuthDynamicParameter[@"client_id"]      = @"-client_id-";
-                oAuthDynamicParameter[@"client_secret"]  = @"-client_secret-";
+                oAuthDynamicParameter[@"client_id"]      = @"ff2ff059d245ae8cb378ab54a92e966d";
+                oAuthDynamicParameter[@"client_secret"]  = @"01f32ac28d7b45e08932f11a958f1d9f";
                 oAuthDynamicParameter[@"refresh_token"]  = @"-refresh_token-";
                 oAuthDynamicParameter[@"grant_type"]     = @"refresh_token";
             }
@@ -213,6 +213,7 @@
     }
     
     if (self.requestMethod == MRRequestParameterRequestMethodPost) {
+        NSLog(@"%@", parameterFormattedString);
         returnObject = [parameterFormattedString dataUsingEncoding:self.resultEncoding == 0 ? NSUTF8StringEncoding : self.resultEncoding];
     }
     

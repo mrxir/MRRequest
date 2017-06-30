@@ -125,8 +125,15 @@
         
         if (parameter.requestMethod == MRRequestParameterRequestMethodPost) {
             self.HTTPMethod = @"POST";
+            
+            NSData *data = parameter.result;
+            
+            if ([data isKindOfClass:[NSData class]]) {
+                self.HTTPBody = data;
+            }
         }
         /*=======================================================================*/
+        
         
     }
     
