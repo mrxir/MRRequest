@@ -56,6 +56,16 @@ typedef NS_ENUM(NSUInteger, MRRequestParameterFormattedStyle) {
 @interface MRRequestParameter : NSObject
 
 /**
+ 本次请求是否开启 OAuth, 默认为不开启
+ */
+@property (nonatomic, assign, getter = isOAuthEnabled) BOOL oAuthEnabled;
+
+/**
+ OAuth 独立开关是否已被设置过
+ */
+@property (nonatomic, assign, getter = isOAuthIndependentSwitchHasBeenSetted) BOOL oAuthIndependentSwitchHasBeenSetted;
+
+/**
  请求范围
  */
 @property (nonatomic) MRRequestParameterRequestScope requestScope;
@@ -100,6 +110,24 @@ typedef NS_ENUM(NSUInteger, MRRequestParameterFormattedStyle) {
  */
 @property (nonatomic, strong, readonly) id result;
 
+/**
+ 相对稳定的参数字符串, 不包括内部生成的随机数, 时间戳等不固定参数以及包含以上参数所生成的参数, 这个参数字符串串用来判定重复请求.
+ 
+ @Instructions: 如果 identifier 有值, 则 identifier 将作为请求的标识符, 也作为重复请求的判断依据.
+ *
+ */
+@property (nonatomic, copy, readonly) NSString *relativelyStableParameterString;
+
+/**
+ 参数标识符, 可根据需求拓展用法.
+ 
+ @Instructions: 如果 identifier 有值, 则 identifier 将作为请求的标识符, 如果请求队列中已经存在一个正在处理(还未返回成功或失败)的请求,
+                那么此后相同标识符的请求将不会被 resume, 也不会挂起或插入队列等候, 而是会直接抛出一个类似于"请勿重复请求"的错误描述信息, 直到那个请求处理完成(返回成功或失败),
+                下一个有着相同标识符的请求才会被 resume.
+ *
+ */
+@property (nonatomic, copy) NSString *identifier;
+
 
 
 #pragma mark - life cycle
@@ -110,11 +138,11 @@ typedef NS_ENUM(NSUInteger, MRRequestParameterFormattedStyle) {
 
 #pragma mark - rewrite setter
 
-- (void)setRequestMethod:(MRRequestParameterRequestMethod)requestMethod;
-
-- (void)setFormattedStyle:(MRRequestParameterFormattedStyle)formattedStyle;
+- (void)setOAuthEnabled:(BOOL)oAuthEnabled;
 
 #pragma mark - rewrite getter
+
+- (id)result;
 
 - (NSString *)description;
 

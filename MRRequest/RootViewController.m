@@ -12,7 +12,7 @@
 
 @interface RootViewController ()<UITableViewDataSource, UITableViewDelegate>
 
-@property (nonatomic, strong) NSArray *viewControllers;
+@property (nonatomic, strong) NSArray *sections;
 
 @property (nonatomic, weak) IBOutlet UITableView *tableView;
 
@@ -26,15 +26,11 @@
     
     self.tableView.rowHeight = 60.0f;
     
-    NSMutableArray *controllers = [NSMutableArray array];
+    NSString *sectionPlistFile = [[NSBundle mainBundle] pathForResource:@"Sections" ofType:@"plist"];
     
-    [controllers addObject:@{@"identifier": @"DetailLoginSimulation",
-                             @"description": @"OAuth2 详细登录模拟"}];
+    NSDictionary *sectionPlistInfo = [NSDictionary dictionaryWithContentsOfFile:sectionPlistFile];
     
-    [controllers addObject:@{@"identifier": @"BriefLoginSimulation",
-                             @"description": @"OAuth2 简要登录模拟"}];
-    
-    self.viewControllers = [NSArray arrayWithArray:controllers];
+    self.sections = sectionPlistInfo[@"sections"];
     
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
@@ -48,18 +44,29 @@
 
 #pragma mark - UITableViewDataSource
 
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    NSString *sectionTitle = self.sections[section][@"title"];
+    return sectionTitle;
+}
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return self.sections.count;
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return self.viewControllers.count;
+    return [self.sections[section][@"item"] count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CELL" forIndexPath:indexPath];
     
-    NSString *description = self.viewControllers[indexPath.row][@"description"];
-    NSString *identifier = self.viewControllers[indexPath.row][@"identifier"];
-    
+    NSString *description = self.sections[indexPath.section][@"item"][indexPath.row][@"description"];
+    NSString *identifier = self.sections[indexPath.section][@"item"][indexPath.row][@"identifier"];
+
     cell.textLabel.text = description;
     cell.detailTextLabel.text = identifier;
     
@@ -72,7 +79,7 @@
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-    NSString *identifier = self.viewControllers[indexPath.row][@"identifier"];
+    NSString *identifier = self.sections[indexPath.section][@"item"][indexPath.row][@"identifier"];
     
     UIViewController *controller = [UIStoryboard matchControllerForIdentifier:identifier];
     

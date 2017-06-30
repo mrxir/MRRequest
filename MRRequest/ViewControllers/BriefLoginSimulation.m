@@ -14,7 +14,7 @@
 
 #import <SVProgressHUD.h>
 
-#import "MRRequestParameter.h"
+#import "MRRequest.h"
 
 @interface BriefLoginSimulation ()
 
@@ -47,6 +47,8 @@
     [self.fillItem setTarget:self];
     [self.fillItem setAction:@selector(didClickFillItem:)];
     
+    NSString *path = @"http://10.0.40.119:8080/oauth/token?";
+    
     // 登录
     [self.loginButton handleWithEvents:UIControlEventTouchUpInside completion:^(__kindof UIControl *control) {
         
@@ -54,8 +56,8 @@
         
         parameter.requestScope = MRRequestParameterRequestScopeRequestAccessToken;
         
-        NSLog(@"result %@", parameter);
-        NSLog(@"result %@", parameter.result);
+        MRRequest *request = [[MRRequest alloc] initWithPath:path parameter:parameter delegate:nil];
+        [request resume];
         
         [SVProgressHUD showWithStatus:@"正在登录..."];
         

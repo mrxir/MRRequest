@@ -15,7 +15,7 @@
 
 #import <SVProgressHUD.h>
 
-#import "MRRequestParameter.h"
+#import "MRRequest.h"
 
 @interface DetailLoginSimulation ()
 {
@@ -71,7 +71,8 @@
         
         parameter.requestScope = MRRequestParameterRequestScopeRequestAccessToken;
         
-        NSLog(@"result %@", parameter.result);
+        MRRequest *request = [[MRRequest alloc] initWithPath:self.serverAddressField.text parameter:parameter delegate:nil];
+        [request resume];
         
         [SVProgressHUD showWithStatus:@"正在登录..."];
         

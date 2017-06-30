@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>sections</key>
+	<array>
+		<dict>
+			<key>title</key>
+			<string>OAuth - Login</string>
+			<key>item</key>
+			<array>
+				<dict>
+					<key>identifier</key>
+					<string>DetailLoginSimulation</string>
+					<key>description</key>
+					<string>OAuth2 详细登录模拟</string>
+				</dict>
+				<dict>
+					<key>identifier</key>
+					<string>BriefLoginSimulation</string>
+					<key>description</key>
+					<string>OAuth2 简要登录模拟</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>title</key>
+			<string>Normal Request</string>
+			<key>item</key>
+			<array>
+				<dict>
+					<key>identifier</key>
+					<string>WeatherQueryController</string>
+					<key>description</key>
+					<string>天气查询模拟</string>
+				</dict>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

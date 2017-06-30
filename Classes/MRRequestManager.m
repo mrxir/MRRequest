@@ -10,6 +10,8 @@
 
 @implementation MRRequestManager
 
+@synthesize processingRequestIdentifierSet = _processingRequestIdentifierSet;
+
 + (instancetype)defaultManager
 {
     static MRRequestManager *s_manager = nil;
@@ -18,6 +20,14 @@
         s_manager = [[MRRequestManager alloc] init];
     });
     return s_manager;
+}
+
+- (NSMutableSet *)processingRequestIdentifierSet
+{
+    if (!_processingRequestIdentifierSet) {
+        _processingRequestIdentifierSet = [NSMutableSet set];
+    }
+    return _processingRequestIdentifierSet;
 }
 
 @end

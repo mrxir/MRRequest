@@ -25,7 +25,8 @@
     [MRRequest setOAuthEnabled:YES];
     
     [UIStoryboard setStoryboardNames:@[@"Main",
-                                       @"LoginModule"]];
+                                       @"LoginModule",
+                                       @"BusinessQueriesModule"]];
     
     return YES;
 }

@@ -8,15 +8,11 @@
 
 #import <Foundation/Foundation.h>
 
-@class MRRequestParameter;
-
 @interface MRRequestManager : NSObject
 
-@property (nonatomic, strong, readonly) MRRequestParameter *previousRequestParameter;
+@property (nonatomic, strong, readonly) NSMutableSet *processingRequestIdentifierSet;
 
-@property (nonatomic, strong, readonly) MRRequestParameter *currentRequestParameter;
-
-@property (nonatomic, assign, getter = isOAuthEnabled) BOOL oauthEnabled;
+@property (nonatomic, assign, getter = isOAuthEnabled) BOOL oAuthEnabled;
 
 + (instancetype)defaultManager;
 

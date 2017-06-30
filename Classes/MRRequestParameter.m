@@ -8,7 +8,7 @@
 
 #import "MRRequestParameter.h"
 
-#import "MRRequest.h"
+#import "MRRequestManager.h"
 
 #import <MRFramework/NSObject+Extension.h>
 #import <MRFramework/NSDictionary+Extension.h>
@@ -44,6 +44,17 @@
     return self;
 }
 
+#pragma mark - rewrite setter
+
+- (void)setOAuthEnabled:(BOOL)oAuthEnabled
+{
+    _oAuthEnabled = oAuthEnabled;
+    
+    _oAuthIndependentSwitchHasBeenSetted = YES;
+}
+
+#pragma mark - rewrite getter
+
 - (id)result
 {
     return [self constructResultWithSource:self.source];
@@ -51,7 +62,12 @@
 
 - (NSString *)description
 {
-    return @"description";
+    NSMutableDictionary *description = [NSMutableDictionary dictionary];
+    
+    description[@"source"] = self.source;
+    description[@"result"] = self.result;
+    
+    return description.stringWithUTF8;
 }
 
 
@@ -60,85 +76,65 @@
 - (id)constructResultWithSource:(id)source
 {
     
-    
-    
-    
-    // >>>>> 处理自定义对象 <<<<<
-    /* custom object to dictionary */
-    /*=======================================================================*/
-    id sourceObject = nil;
-    
-    if (![NSJSONSerialization isValidJSONObject:source]) {
-        
-        // Maybe the 'source' is kind of custom object, so get its property dictionary and use it.
-        
-        sourceObject = [NSObject propertyWithObject:source];
-        
+    // OAuth 开关状态
+    BOOL oAuthEnabled = NO;
+    if (self.isOAuthIndependentSwitchHasBeenSetted == YES) {
+        oAuthEnabled = self.isOAuthEnabled;
     } else {
-        
-        sourceObject = source;
+        oAuthEnabled = [MRRequestManager defaultManager].isOAuthEnabled;
     }
-    /*=======================================================================*/
     
     
+    // 处理 source 源对象, 可转JSON对象的保持不变, 不可转JSON对象的尝试将其属性转换为 NSDictionary
+    id validJSONObjectOrString = nil;
     
+    if ([NSJSONSerialization isValidJSONObject:source]) {
+        validJSONObjectOrString = source;
+    } else {
+        if ([source superclass] == [NSObject class]) {
+            validJSONObjectOrString = [NSObject propertyWithObject:source];
+        } else {
+            validJSONObjectOrString = [source description];
+        }
+    }
     
-    // >>>>> 处理OAuth开关 <<<<<
-    /* edit source object if need */
-    /*=======================================================================*/
-    id editedSourceObject = nil;
+    id relativelyStableValidJSONObjectOrString = validJSONObjectOrString;
     
-    // 根据 OAuthEnabled 判定是否开启 OAuth 认证, 从而决定是否要对参数进行再处理.
-    if ([MRRequest getOAuthEnabled] == YES) {
+    // 根据 oAuth 开关状态插入参数
+    if (oAuthEnabled == YES) {
         
-        // sourceObject 必须为 NSDictionary 类型
-        if ([sourceObject isKindOfClass:[NSDictionary class]]) {
+        if (validJSONObjectOrString == nil) validJSONObjectOrString = [NSDictionary dictionary];
+        
+        if ([validJSONObjectOrString isKindOfClass:[NSDictionary class]]) {
             
+            NSMutableDictionary *oAuthDynamicParameter = [NSMutableDictionary dictionaryWithDictionary:validJSONObjectOrString];
             
-            
-            
-            // >>>>> 处理请求范围 <<<<<
-            /*=======================================================================*/
-            NSMutableDictionary *sourceDictionary = [NSMutableDictionary dictionaryWithDictionary:sourceObject];
-
             // 根据 requestScope 判定应该增加哪些特定参数
             if (self.requestScope == MRRequestParameterRequestScopeNormal) {
-                
-                sourceDictionary[@"access_token"]   = @"****** - access_token - ******";
-                
+                oAuthDynamicParameter[@"access_token"]   = @"-access_token-";
             }
             
             if (self.requestScope == MRRequestParameterRequestScopeRequestAccessToken) {
-                
-                sourceDictionary[@"client_id"]      = @"****** - client_id - ******";
-                
-                sourceDictionary[@"client_secret"]  = @"****** - client_secret - ******";
-                
-                sourceDictionary[@"grant_type"]     = @"password";
-                
+                oAuthDynamicParameter[@"client_id"]      = @"-client_id-";
+                oAuthDynamicParameter[@"client_secret"]  = @"-client_secret-";
+                oAuthDynamicParameter[@"grant_type"]     = @"password";
             }
             
             if (self.requestScope == MRRequestParameterRequestScopeRefreshAccessToken) {
-                
-                sourceDictionary[@"client_id"]      = @"****** - client_id - ******";
-                
-                sourceDictionary[@"client_secret"]  = @"****** - client_secret - ******";
-                
-                sourceDictionary[@"refresh_token"]  = @"****** - refresh_token - ******";
-                
-                sourceDictionary[@"grant_type"]     = @"refresh_token";
-                
+                oAuthDynamicParameter[@"client_id"]      = @"-client_id-";
+                oAuthDynamicParameter[@"client_secret"]  = @"-client_secret-";
+                oAuthDynamicParameter[@"refresh_token"]  = @"-refresh_token-";
+                oAuthDynamicParameter[@"grant_type"]     = @"refresh_token";
             }
-            /*=======================================================================*/
             
-            // 设置欲返回数据的数据格式为 json
-            sourceDictionary[@"format"] = @"json";
+            oAuthDynamicParameter[@"format"] = @"json";
             
-            // 设置本次请求的 timestamp
-            sourceDictionary[@"timestamp"] = [_timestampDateFormatter stringFromDate:[NSDate date]];
+            relativelyStableValidJSONObjectOrString = [NSDictionary dictionaryWithDictionary:oAuthDynamicParameter];
+            
+            oAuthDynamicParameter[@"timestamp"] = [_timestampDateFormatter stringFromDate:[NSDate date]];
             
             // 使用非空的键值对进行签名
-            NSMutableDictionary *notEmptyKeyValueMap = [NSMutableDictionary dictionaryWithDictionary:sourceDictionary];
+            NSMutableDictionary *notEmptyKeyValueMap = [NSMutableDictionary dictionaryWithDictionary:oAuthDynamicParameter];
             [notEmptyKeyValueMap enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
                 if ([obj respondsToSelector:@selector(length)]) {
                     if ([obj performSelector:@selector(length)] == 0) {
@@ -146,82 +142,79 @@
                     }
                 }
             }];
+            oAuthDynamicParameter[@"sign"] = notEmptyKeyValueMap.formattedIntoFormStyleString.md5Hash;
             
-            // 签名
-            sourceDictionary[@"sign"] = notEmptyKeyValueMap.formattedIntoFormStyleString.md5Hash;
-            
-            editedSourceObject = sourceDictionary;
-            
-        } else {
-            
-            NSLog(@"[ERROR] OAuth request only accept NSDictionary to be source object.");
-            
-            editedSourceObject = sourceObject;
+            validJSONObjectOrString = oAuthDynamicParameter;
             
         }
         
-    } else {
-        
-        editedSourceObject = sourceObject;
-        
     }
-    /*=======================================================================*/
     
+    // 若此时 validJSONObjectOrString 为空, 则直接返回 nil.
+    if (validJSONObjectOrString == nil) return nil;
     
+    // 参数格式化
+    NSString *parameterFormattedString = nil;
     
+    // 相对稳定对象格式化
+    NSString *relativelyStableValidJSONObjectOrStringFormattedstring = nil;
     
-    // >>>>> 处理格式化样式 <<<<<
-    /* formatted style */
-    /*=======================================================================*/
-    NSString *formattedParamString = nil;
-    
+    // 格式化为 JSON 字符串
     if (self.formattedStyle == MRRequestParameterFormattedStyleJSON) {
         
-        NSError *error = nil;
-        formattedParamString = [NSJSONSerialization stringWithJSONObject:editedSourceObject options:0 error:&error];
-        if (error) NSLog(@"Class:%s line:%d\n%@", __FUNCTION__, __LINE__, error);
-        if (!formattedParamString) formattedParamString = @"";
+        parameterFormattedString = [NSJSONSerialization stringWithJSONObject:validJSONObjectOrString options:0 error:nil];
+        
+        relativelyStableValidJSONObjectOrStringFormattedstring = [NSJSONSerialization stringWithJSONObject:relativelyStableValidJSONObjectOrString options:0 error:nil];
         
     }
     
+    // 格式化为 FORM 字符串
     if (self.formattedStyle == MRRequestParameterFormattedStyleForm) {
         
-        formattedParamString = [editedSourceObject formattedIntoFormStyleString];
+        if ([validJSONObjectOrString isKindOfClass:[NSDictionary class]]) {
+            
+            parameterFormattedString = [validJSONObjectOrString formattedIntoFormStyleString];
+            
+            relativelyStableValidJSONObjectOrStringFormattedstring = [relativelyStableValidJSONObjectOrString formattedIntoFormStyleString];
+            
+        } else {
+            
+            parameterFormattedString = [NSJSONSerialization stringWithJSONObject:validJSONObjectOrString options:0 error:nil];
+
+            relativelyStableValidJSONObjectOrStringFormattedstring = [NSJSONSerialization stringWithJSONObject:relativelyStableValidJSONObjectOrString options:0 error:nil];
+
+        }
+        
+        if (!parameterFormattedString) {
+            parameterFormattedString = [validJSONObjectOrString description];
+        }
+        
+        if (!relativelyStableValidJSONObjectOrStringFormattedstring) {
+            relativelyStableValidJSONObjectOrStringFormattedstring = [relativelyStableValidJSONObjectOrString description];
+        }
         
     }
-    /*=======================================================================*/
     
-    
-    
-    
-    // >>>>> 处理参数前缀 <<<<<
-    /* prefix */
-    /*=======================================================================*/
+    // 处理参数前缀
     if (self.sourcePrefix.length) {
         
-        formattedParamString = [self.sourcePrefix stringByAppendingString:formattedParamString];
+        parameterFormattedString = [self.sourcePrefix stringByAppendingString:parameterFormattedString];
+        
+        relativelyStableValidJSONObjectOrStringFormattedstring = [self.sourcePrefix stringByAppendingString:relativelyStableValidJSONObjectOrStringFormattedstring];
     }
-    /*=======================================================================*/
     
+    _relativelyStableParameterString = relativelyStableValidJSONObjectOrStringFormattedstring;
     
-    
-    
-    // >>>>> 处理请求方式 <<<<<
-    /* if request method is POST generate NSData  */
-    /*=======================================================================*/
+    // 处理请求方式
     id returnObject = nil;
     
     if (self.requestMethod == MRRequestParameterRequestMethodGet) {
-        returnObject = self.resultEncoding == 0 ? formattedParamString : [formattedParamString stringByAddingPercentEscapesUsingEncoding:self.resultEncoding];
+        returnObject = self.resultEncoding == 0 ? parameterFormattedString : [parameterFormattedString stringByAddingPercentEscapesUsingEncoding:self.resultEncoding];
     }
     
     if (self.requestMethod == MRRequestParameterRequestMethodPost) {
-        returnObject = [formattedParamString dataUsingEncoding:self.resultEncoding == 0 ? NSUTF8StringEncoding : self.resultEncoding];
+        returnObject = [parameterFormattedString dataUsingEncoding:self.resultEncoding == 0 ? NSUTF8StringEncoding : self.resultEncoding];
     }
-    /*=======================================================================*/
-    
-    
-    NSLog(@"%@", returnObject);
     
     return returnObject;
     
