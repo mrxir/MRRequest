@@ -9,10 +9,13 @@
 #import "WeatherQueryController.h"
 
 #import <MRFramework/UIControl+Extension.h>
+#import <MRFramework/NSObject+Extension.h>
 
 #import "MRRequest.h"
 
-@interface WeatherQueryController ()<MRRequestDelegate>
+#import <SVProgressHUD.h>
+
+@interface WeatherQueryController ()
 
 @property (nonatomic, weak) IBOutlet UITextField *cityField;
 
@@ -55,16 +58,19 @@
         
         MRRequestParameter *parameter = [[MRRequestParameter alloc] initWithObject:object];
 
-        parameter.oAuthEnabled = NO;
+        parameter.oAuthIndependentSwitchState = NO;
         parameter.formattedStyle = MRRequestParameterFormattedStyleForm;
         
+        [SVProgressHUD showWithStatus:@"请稍候..."];
         [MRRequest requestWithPath:path parameter:parameter success:^(MRRequest *request, id receiveObject) {
             
-            NSLog(@"%@", receiveObject);
+            [SVProgressHUD dismiss];
+            
+            self.resultTextView.text = [NSString stringWithFormat:@"%@", [receiveObject stringWithUTF8]];
             
         } failure:^(MRRequest *request, id requestObject, NSData *data, NSError *error) {
             
-            NSLog(@"%@", error);
+            [SVProgressHUD showErrorWithStatus:error.localizedDescription];
             
         }];
        

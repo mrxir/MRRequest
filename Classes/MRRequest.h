@@ -13,19 +13,32 @@
 #import "MRRequestParameter.h"
 #import "MRRequestDelegate.h"
 
+FOUNDATION_EXPORT NSErrorDomain const MRRequestErrorDomain;
+
+/**
+ MRRequest 错误码
+ 
+ - MRRequestErrorCodeGlobalInvalidJSONSerializationFormat:      通用错误码, 不可用的JSON序列化格式
+ - MRRequestErrorCodeGlobalInProcessingSameRequest:             通用错误码, 正在处理相同请求
+ - MRRequestErrorCodeOAuthOrdinaryBusinessTolerableFailed:      OAuth错误码, 可容忍的普通业务失败, 不需要重新登录
+ - MRRequestErrorCodeOAuthOrdinaryBusinessIntolerableFailed:    OAuth错误码, 不可容忍的普通业务失败, 需要重新登录
+ - MRRequestErrorCodeOAuthRequestAccessTokenFailed:             OAuth错误码, 获取 access token 失败
+ - MRRequestErrorCodeOAuthRefreshAccessTokenFailed:             OAuth错误码, 刷新 access token 失败
+ */
 typedef NS_ENUM(NSUInteger, MRRequestErrorCode) {
     
-    MRRequestErrorCodeInvalidAccessToken = 7782567,
-    MRRequestErrorCodeInvalidRefreshToken = 7782568,
-    MRRequestErrorCodeHandlingSameRequest = 7782777,
+    MRRequestErrorCodeGlobalInvalidJSONSerializationFormat      = 7782000,
+    MRRequestErrorCodeGlobalInProcessingSameRequest             = 7782001,
     
+    MRRequestErrorCodeOAuthOrdinaryBusinessTolerableFailed      = 7782002,
+    MRRequestErrorCodeOAuthOrdinaryBusinessIntolerableFailed    = 7782003,
+    MRRequestErrorCodeOAuthRequestAccessTokenFailed             = 7782004,
+    MRRequestErrorCodeOAuthRefreshAccessTokenFailed             = 7782005,
     
 };
 
 typedef void(^Progress)(MRRequest *request, CGFloat progress);
-
 typedef void(^Success)(MRRequest *request, id receiveObject);
-
 typedef void(^Failure)(MRRequest *request, id requestObject, NSData *data, NSError *error);
 
 @interface MRRequest : NSMutableURLRequest
@@ -35,9 +48,7 @@ typedef void(^Failure)(MRRequest *request, id requestObject, NSData *data, NSErr
 @property (nonatomic, copy) Failure failure;
 
 @property (nonatomic, copy, readonly) NSString *path;
-
 @property (nonatomic, strong, readonly) MRRequestParameter *parameter;
-
 @property (nonatomic, weak, readonly) id <MRRequestDelegate> delegate;
 
 #pragma mark - life cycle
@@ -55,11 +66,15 @@ typedef void(^Failure)(MRRequest *request, id requestObject, NSData *data, NSErr
                 success:(Success)success
                 failure:(Failure)failure;
 
-- (void)resume;
+/**
+ 执行
+ */
+- (void)execute;
 
-- (void)cancel;
-
-- (void)dealloc;
+/**
+ 退出
+ */
+- (void)exit;
 
 @end
 

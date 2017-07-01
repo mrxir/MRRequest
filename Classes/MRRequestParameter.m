@@ -46,9 +46,9 @@
 
 #pragma mark - rewrite setter
 
-- (void)setOAuthEnabled:(BOOL)oAuthEnabled
+- (void)setOAuthIndependentSwitchState:(BOOL)oAuthIndependentSwitchState
 {
-    _oAuthEnabled = oAuthEnabled;
+    _oAuthIndependentSwitchState = oAuthIndependentSwitchState;
     
     _oAuthIndependentSwitchHasBeenSetted = YES;
 }
@@ -79,7 +79,7 @@
     // OAuth 开关状态
     BOOL oAuthEnabled = NO;
     if (self.isOAuthIndependentSwitchHasBeenSetted == YES) {
-        oAuthEnabled = self.isOAuthEnabled;
+        oAuthEnabled = self.isOAuthIndependentSwitchState;
     } else {
         oAuthEnabled = [MRRequestManager defaultManager].isOAuthEnabled;
     }
@@ -110,17 +110,17 @@
             NSMutableDictionary *oAuthDynamicParameter = [NSMutableDictionary dictionaryWithDictionary:validJSONObjectOrString];
             
             // 根据 requestScope 判定应该增加哪些特定参数
-            if (self.requestScope == MRRequestParameterRequestScopeNormal) {
+            if (self.oAuthRequestScope == MRRequestParameterOAuthRequestScopeOrdinaryBusiness) {
                 oAuthDynamicParameter[@"access_token"]   = @"-access_token-";
             }
             
-            if (self.requestScope == MRRequestParameterRequestScopeRequestAccessToken) {
+            if (self.oAuthRequestScope == MRRequestParameterOAuthRequestScopeRequestAccessToken) {
                 oAuthDynamicParameter[@"client_id"]      = @"ff2ff059d245ae8cb378ab54a92e966d";
                 oAuthDynamicParameter[@"client_secret"]  = @"01f32ac28d7b45e08932f11a958f1d9f";
                 oAuthDynamicParameter[@"grant_type"]     = @"password";
             }
             
-            if (self.requestScope == MRRequestParameterRequestScopeRefreshAccessToken) {
+            if (self.oAuthRequestScope == MRRequestParameterOAuthRequestScopeRefreshAccessToken) {
                 oAuthDynamicParameter[@"client_id"]      = @"ff2ff059d245ae8cb378ab54a92e966d";
                 oAuthDynamicParameter[@"client_secret"]  = @"01f32ac28d7b45e08932f11a958f1d9f";
                 oAuthDynamicParameter[@"refresh_token"]  = @"-refresh_token-";
@@ -213,7 +213,6 @@
     }
     
     if (self.requestMethod == MRRequestParameterRequestMethodPost) {
-        NSLog(@"%@", parameterFormattedString);
         returnObject = [parameterFormattedString dataUsingEncoding:self.resultEncoding == 0 ? NSUTF8StringEncoding : self.resultEncoding];
     }
     

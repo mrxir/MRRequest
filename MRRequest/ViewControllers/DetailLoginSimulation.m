@@ -12,6 +12,7 @@
 #import <MRFramework/UIControl+Extension.h>
 #import <MRFramework/NSDictionary+Extension.h>
 #import <MRFramework/NSString+Extension.h>
+#import <MRFramework/NSObject+Extension.h>
 
 #import <SVProgressHUD.h>
 
@@ -43,6 +44,8 @@
 
 @property (weak, nonatomic) IBOutlet UIButton *loginButton;
 
+@property (weak, nonatomic) IBOutlet UITextView *resultTextView;
+
 @property (nonatomic, strong) NSMutableDictionary *loginInfo;
 
 @end
@@ -69,16 +72,29 @@
         
         MRRequestParameter *parameter = [[MRRequestParameter alloc] initWithObject:self.loginInfo];
         
-        parameter.requestScope = MRRequestParameterRequestScopeRequestAccessToken;
+        parameter.oAuthRequestScope = MRRequestParameterOAuthRequestScopeRequestAccessToken;
         parameter.requestMethod = MRRequestParameterRequestMethodPost;
         parameter.formattedStyle = MRRequestParameterFormattedStyleForm;
-        
-        MRRequest *request = [[MRRequest alloc] initWithPath:self.serverAddressField.text parameter:parameter delegate:nil];
-        [request resume];
         
         [SVProgressHUD showWithStatus:@"正在登录..."];
         
         [SVProgressHUD dismissWithDelay:3];
+
+        [MRRequest requestWithPath:self.serverAddressField.text parameter:parameter success:^(MRRequest *request, id receiveObject) {
+            
+            [SVProgressHUD dismiss];
+            
+            self.resultTextView.text = [NSString stringWithFormat:@"%@", [receiveObject stringWithUTF8]];
+            
+        } failure:^(MRRequest *request, id requestObject, NSData *data, NSError *error) {
+            
+            [SVProgressHUD showErrorWithStatus:error.localizedDescription];
+            
+            self.resultTextView.text = error.description;
+            
+        }];
+        
+        
         
         
     }];

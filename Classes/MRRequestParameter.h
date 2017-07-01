@@ -11,16 +11,16 @@
 #pragma mark - 枚举 网络请求范围
 
 /**
- 网络请求范围
+ OAuth 请求范围
 
- - MRRequestParameterRequestScopeNormal: 普通请求
- - MRRequestParameterRequestScopeRequestAccessToken: 获取 access token 请求
- - MRRequestParameterRequestScopeRefreshAccessToken: 刷新 access token 请求
+ - MRRequestParameterOAuthRequestScopeOrdinaryBusiness: 普通业务
+ - MRRequestParameterOAuthRequestScopeRequestAccessToken: 获取 token
+ - MRRequestParameterOAuthRequestScopeRefreshAccessToken: 刷新 token
  */
-typedef NS_ENUM(NSUInteger, MRRequestParameterRequestScope) {
-    MRRequestParameterRequestScopeNormal,
-    MRRequestParameterRequestScopeRequestAccessToken,
-    MRRequestParameterRequestScopeRefreshAccessToken,
+typedef NS_ENUM(NSUInteger, MRRequestParameterOAuthRequestScope) {
+    MRRequestParameterOAuthRequestScopeOrdinaryBusiness,
+    MRRequestParameterOAuthRequestScopeRequestAccessToken,
+    MRRequestParameterOAuthRequestScopeRefreshAccessToken,
 };
 
 
@@ -58,7 +58,7 @@ typedef NS_ENUM(NSUInteger, MRRequestParameterFormattedStyle) {
 /**
  本次请求是否开启 OAuth, 默认为不开启
  */
-@property (nonatomic, assign, getter = isOAuthEnabled) BOOL oAuthEnabled;
+@property (nonatomic, assign, getter = isOAuthIndependentSwitchState) BOOL oAuthIndependentSwitchState;
 
 /**
  OAuth 独立开关是否已被设置过
@@ -66,9 +66,9 @@ typedef NS_ENUM(NSUInteger, MRRequestParameterFormattedStyle) {
 @property (nonatomic, assign, getter = isOAuthIndependentSwitchHasBeenSetted) BOOL oAuthIndependentSwitchHasBeenSetted;
 
 /**
- 请求范围
+ OAuth 请求范围
  */
-@property (nonatomic) MRRequestParameterRequestScope requestScope;
+@property (nonatomic) MRRequestParameterOAuthRequestScope oAuthRequestScope;
 
 /**
  请求方法
@@ -138,7 +138,7 @@ typedef NS_ENUM(NSUInteger, MRRequestParameterFormattedStyle) {
 
 #pragma mark - rewrite setter
 
-- (void)setOAuthEnabled:(BOOL)oAuthEnabled;
+- (void)setOAuthIndependentSwitchState:(BOOL)oAuthIndependentSwitchState;
 
 #pragma mark - rewrite getter
 

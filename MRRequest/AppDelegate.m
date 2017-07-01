@@ -12,6 +12,8 @@
 
 #import "MRRequest.h"
 
+#import <SVProgressHUD.h>
+
 @interface AppDelegate ()
 
 @end
@@ -27,6 +29,8 @@
     [UIStoryboard setStoryboardNames:@[@"Main",
                                        @"LoginModule",
                                        @"BusinessQueriesModule"]];
+    
+    [SVProgressHUD setMinimumSize:CGSizeMake(100, 100)];
     
     return YES;
 }

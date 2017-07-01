@@ -54,14 +54,25 @@
         
         MRRequestParameter *parameter = [[MRRequestParameter alloc] initWithObject:self.loginInfo];
         
-        parameter.requestScope = MRRequestParameterRequestScopeRequestAccessToken;
-        
-        MRRequest *request = [[MRRequest alloc] initWithPath:path parameter:parameter delegate:nil];
-        [request resume];
+        parameter.oAuthRequestScope = MRRequestParameterOAuthRequestScopeRequestAccessToken;
         
         [SVProgressHUD showWithStatus:@"正在登录..."];
         
         [SVProgressHUD dismissWithDelay:3];
+        
+        [MRRequest requestWithPath:path parameter:parameter success:^(MRRequest *request, id receiveObject) {
+            
+            NSLog(@"%@", receiveObject);
+            
+        } failure:^(MRRequest *request, id requestObject, NSData *data, NSError *error) {
+            
+            if (error.code == MRRequestErrorCodeOAuthRequestAccessTokenFailed) {
+                
+                [SVProgressHUD showErrorWithStatus:@"用户名或密码错误"];
+                
+            }
+            
+        }];
         
         
     }];
