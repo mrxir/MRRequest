@@ -8,7 +8,7 @@
 
 #import "MRRequestParameter.h"
 
-#import "MRRequestManager.h"
+#import "MRRequest.h"
 
 #import <MRFramework/NSObject+Extension.h>
 #import <MRFramework/NSDictionary+Extension.h>
@@ -81,7 +81,7 @@
     if (self.isOAuthIndependentSwitchHasBeenSetted == YES) {
         oAuthEnabled = self.isOAuthIndependentSwitchState;
     } else {
-        oAuthEnabled = [MRRequestManager defaultManager].isOAuthEnabled;
+        oAuthEnabled = [MRRequest isOAuthEnabled];
     }
     
     
