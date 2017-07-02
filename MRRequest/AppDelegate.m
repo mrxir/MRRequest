@@ -24,13 +24,35 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     
+    NSDictionary *report = nil;
+    
+    if ([MRRequest checkOAuthAccessTokenStateAndExecutePresetMethodIfNeed:YES checkReport:&report]) {
+        
+        NSLog(@"access token invalid");
+        
+    } else {
+        
+        NSLog(@"access token available");
+        
+    }
+    
+    NSLog(@"%@", report);
+    
+    // 模拟设置 OAuth 授权信息
+    [[NSUserDefaults standardUserDefaults] setValue:@"123456789012345678" forKey:@"access_token"];
+    [[NSUserDefaults standardUserDefaults] setValue:@"000000000000000000" forKey:@"refresh_token"];
+    [[NSUserDefaults standardUserDefaults] setValue:@(30) forKey:@"expires_in"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
     [MRRequest setOAuthEnabled:YES];
+    [MRRequest setOAuthStateMandatoryInvalidTimeInterval:100.0f];
+    [MRRequest setOAuthStatePeriodicCheckTimeInterval:3.0f];
     
     [UIStoryboard setStoryboardNames:@[@"Main",
                                        @"LoginModule",
                                        @"BusinessQueriesModule"]];
     
-    [SVProgressHUD setMinimumSize:CGSizeMake(100, 100)];
+    [SVProgressHUD setMinimumSize:CGSizeMake(100.0f, 100.0f)];
     
     return YES;
 }

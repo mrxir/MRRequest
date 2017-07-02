@@ -266,6 +266,14 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     }
     
     // delegate success
+    
+    
+    if ([MRRequest isOAuthStateAfterOrdinaryBusinessRequestCheckEnabled] == YES) {
+        
+        
+        
+    }
+    
 
 }
 
@@ -293,7 +301,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     if (self.parameter.isOAuthIndependentSwitchHasBeenSetted == YES) {
         oAuthEnabled = self.parameter.isOAuthIndependentSwitchState;
     } else {
-        oAuthEnabled = [MRRequestManager defaultManager].isOAuthEnabled;
+        oAuthEnabled = [MRRequest isOAuthEnabled];
     }
     
     if (oAuthEnabled == YES) {
@@ -329,29 +337,28 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
         
     } else {
         
-        if (![NSJSONSerialization isValidJSONObject:self.receiveObject]) {
+        if (![self.receiveObject isKindOfClass:[NSDictionary class]]) {
             
-            NSError *error = [NSError errorWithDomain:MRRequestErrorDomain
-                                                 code:MRRequestErrorCodeGlobalInvalidJSONSerializationFormat
-                                             userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"无效的JSON序列化格式 😨", nil)}];
-            
-            self.anyError = error;
-            
-            [self failed];
+            [self succeeded];
             
         } else {
             
-            if (![self.receiveObject isKindOfClass:[NSDictionary class]]) {
+            NSError *error = nil;
+            
+            if ([self searchAndHandleForExceptionCharacteristicsInReceiveDictionary:&error] == NO) {
                 
-                [self succeeded];
+                self.anyError = error;
+                
+                [self failed];
                 
             } else {
                 
-                [self searchAndHandleForExceptionCharacteristicsInReceiveDictionary];
+                [self handleOAuthResultDictionary];
                 
             }
             
         }
+
         
     }
     
@@ -376,7 +383,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     }
 }
 
-- (void)searchAndHandleForExceptionCharacteristicsInReceiveDictionary
+- (BOOL)searchAndHandleForExceptionCharacteristicsInReceiveDictionary:(NSError **)error
 {
     NSDictionary *receiveDictionary = [NSDictionary dictionaryWithDictionary:self.receiveObject];
     
@@ -458,22 +465,34 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
             
         }
         
-        NSError *error = [NSError errorWithDomain:MRRequestErrorDomain
-                                             code:requestErrorCode
-                                         userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(oAuthRequestErrorDescription, nil),
-                                                    NSLocalizedFailureReasonErrorKey: NSLocalizedString(failureReason, nil)}];
+        *error = [NSError errorWithDomain:MRRequestErrorDomain
+                                     code:requestErrorCode
+                                 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(oAuthRequestErrorDescription, nil),
+                                            NSLocalizedFailureReasonErrorKey: NSLocalizedString(failureReason, nil)}];
         
-        self.anyError = error;
-        
-        [self failed];
-        
+        return NO;
         
     } else {
         
-        [self succeeded];
+        return YES;
         
     }
     
+}
+
+- (void)handleOAuthResultDictionary
+{
+    NSDictionary *oAuthResultDictionary = [NSDictionary dictionaryWithDictionary:self.receiveObject];
+    
+    MROAuthRequestManager *oAuthManager = [MROAuthRequestManager defaultManager];
+    
+    oAuthManager.oAuthResultInfo = oAuthResultDictionary;
+    
+    oAuthManager.access_token = oAuthResultDictionary[@"access_token"];
+    oAuthManager.refresh_token = oAuthResultDictionary[@"refresh_token"];
+    oAuthManager.expires_in = oAuthResultDictionary[@"expires_in"];
+    
+    [self succeeded];
 }
 
 @end
@@ -489,9 +508,74 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     [MRRequestManager defaultManager].oAuthEnabled = enabled;
 }
 
-+ (BOOL)oAuthEnabled
++ (BOOL)isOAuthEnabled
 {
     return [MRRequestManager defaultManager].isOAuthEnabled;
 }
+
++ (void)setOAuthStatePeriodicCheckEnabled:(BOOL)enabled
+{
+    [MROAuthRequestManager defaultManager].oAuthStatePeriodicCheckEnabled = enabled;
+}
+
++ (BOOL)isOAuthStatePeriodicCheckEnabled
+{
+    return [MROAuthRequestManager defaultManager].isOAuthStatePeriodicCheckEnabled;
+}
+
++ (void)setOAuthStatePeriodicCheckTimeInterval:(NSTimeInterval)timeInterval
+{
+    [MROAuthRequestManager defaultManager].oAuthStatePeriodicCheckTimeInterval = timeInterval;
+}
+
++ (NSTimeInterval)oAuthStatePeriodicCheckTimeInterval
+{
+    return [MROAuthRequestManager defaultManager].oAuthStatePeriodicCheckTimeInterval;
+}
+
++ (void)setOAuthAutoRefreshAccessTokenWhenNecessaryEnabled:(BOOL)enabled
+{
+    [MROAuthRequestManager defaultManager].oAuthautoRefreshAccessTokenWhenNecessaryEnabled = enabled;
+}
+
++ (BOOL)isOAuthAutoRefreshAccessTokenWhenNecessaryEnabled
+{
+    return [MROAuthRequestManager defaultManager].isOAuthAutoRefreshAccessTokenWhenNecessaryEnabled;
+}
+
++ (void)setOAuthStateAfterOrdinaryBusinessRequestCheckEnabled:(BOOL)enabled
+{
+    [MROAuthRequestManager defaultManager].oAuthStateAfterOrdinaryBusinessRequestCheckEnabled = enabled;
+}
+
++ (BOOL)isOAuthStateAfterOrdinaryBusinessRequestCheckEnabled
+{
+    return [MROAuthRequestManager defaultManager].isOAuthStateAfterOrdinaryBusinessRequestCheckEnabled;
+}
+
++ (void)setOAuthStateMandatoryInvalidTimeInterval:(NSTimeInterval)timeInterval
+{
+    [MROAuthRequestManager defaultManager].oAuthStateMandatoryInvalidTimeInterval = timeInterval;
+}
+
++ (NSTimeInterval)oAuthStateMandatoryInvalidTimeInterval
+{
+    return [MROAuthRequestManager defaultManager].oAuthStateMandatoryInvalidTimeInterval;
+}
+
++ (BOOL)checkOAuthAccessTokenStateAndExecutePresetMethodIfNeed:(BOOL)ifNeed checkReport:(NSDictionary **)report
+{
+    return [[MROAuthRequestManager defaultManager] checkOAuthStateAndExecutePresetMethodIfNeed:@(ifNeed)
+                                                                                   checkOption:MROAuthStateCheckOptionCheckAccessToken
+                                                                                   checkResult:report];
+}
+
++ (BOOL)checkOAuthRefreshTokenStateAndExecutePresetMethodIfNeed:(BOOL)ifNeed checkReport:(NSDictionary **)report
+{
+    return [[MROAuthRequestManager defaultManager] checkOAuthStateAndExecutePresetMethodIfNeed:@(ifNeed)
+                                                                                   checkOption:MROAuthStateCheckOptionCheckRefreshToken
+                                                                                   checkResult:report];
+}
+
 
 @end

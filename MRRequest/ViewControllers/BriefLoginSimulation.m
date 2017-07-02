@@ -39,6 +39,8 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
+    [[MROAuthRequestManager defaultManager] setValue:@"value" forKey:@"key"];
+    
     self.loginInfo = [NSMutableDictionary dictionary];
     
     [self.resetItem setTarget:self];
