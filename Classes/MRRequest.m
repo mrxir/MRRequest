@@ -482,15 +482,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
 
 - (void)handleOAuthResultDictionary
 {
-    NSDictionary *oAuthResultDictionary = [NSDictionary dictionaryWithDictionary:self.receiveObject];
-    
-    MROAuthRequestManager *oAuthManager = [MROAuthRequestManager defaultManager];
-    
-    oAuthManager.oAuthResultInfo = oAuthResultDictionary;
-    
-    oAuthManager.access_token = oAuthResultDictionary[@"access_token"];
-    oAuthManager.refresh_token = oAuthResultDictionary[@"refresh_token"];
-    oAuthManager.expires_in = oAuthResultDictionary[@"expires_in"];
+    [[MROAuthRequestManager defaultManager] updateOAuthArchiveWithResultDictionary:self.receiveObject];
     
     [self succeeded];
 }

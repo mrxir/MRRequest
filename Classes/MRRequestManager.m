@@ -38,6 +38,10 @@
 {
     _oAuthEnabled = oAuthEnabled;
     
+    [MROAuthRequestManager defaultManager].oAuthStateMandatoryInvalidTimeInterval =
+    ([MROAuthRequestManager defaultManager].oAuthStateMandatoryInvalidTimeInterval == 0 ?
+     604800.0f : [MROAuthRequestManager defaultManager].oAuthStateMandatoryInvalidTimeInterval);
+    
     [MROAuthRequestManager defaultManager].oAuthStatePeriodicCheckEnabled = _oAuthEnabled;
     
     [MROAuthRequestManager defaultManager].oAuthStateAfterOrdinaryBusinessRequestCheckEnabled = _oAuthEnabled;
@@ -77,6 +81,26 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
         s_manager = [[MROAuthRequestManager alloc] init];
     });
     return s_manager;
+}
+
+- (void)updateOAuthArchiveWithResultDictionary:(NSDictionary *)dictionary
+{
+    NSLog(@"%s", __FUNCTION__);
+    
+    self.oAuthResultInfo = dictionary;
+    
+    NSDate *systemDate = [NSDate date];
+    
+    NSDictionary *oAuthResultInfo = dictionary;
+    
+    self.access_token = oAuthResultInfo[@"access_token"];
+    self.access_token_storage_date = systemDate;
+    
+    self.refresh_token = oAuthResultInfo[@"refresh_token"];
+    self.refresh_token_storage_date = systemDate;
+    
+    self.expires_in = oAuthResultInfo[@"expires_in"];
+    
 }
 
 #pragma mark - rewrite setter
@@ -228,15 +252,33 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
     
     NSDate *systemDate = [NSDate date];
     
-    BOOL is_access_token_invalid = YES;
-    
-    BOOL is_refresh_token_invalid = YES;
-    
     // check if access_token exist or expired
-    if (self.access_token == nil || self.access_token_storage_date == nil) {
+    
+    BOOL is_access_token_invalid = NO;
+
+    if (self.access_token == nil) {
         
-        self.access_token_storage_date = systemDate;
         is_access_token_invalid = YES;
+        
+        self.access_token_storage_date = [NSDate distantPast];
+        
+        if (option == MROAuthStateCheckOptionCheckAccessToken) {
+            
+            NSMutableDictionary *oAuthResultInfo = [NSMutableDictionary dictionaryWithDictionary:self.oAuthResultInfo];
+            
+            NSDictionary *addition = @{@"+_refresh_token_expires_in": @(self.oAuthStateMandatoryInvalidTimeInterval),
+                                       @"+_access_token_available": @(!is_access_token_invalid),
+                                       @"+_access_token_durability_rate": @(kAccessTokenDurabilityRate),
+                                       @"+_access_token_durability_timeInterval": @(0),
+                                       @"+_access_token_storage_date": self.access_token_storage_date,
+                                       @"+_access_token_used_timeInterval": @(0),
+                                       @"+_access_token_usable_timeInterval": @(0)};
+            
+            [oAuthResultInfo setValuesForKeysWithDictionary:addition];
+            
+            *result = oAuthResultInfo;
+            
+        }
         
     } else {
         
@@ -252,7 +294,8 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
             
             NSMutableDictionary *oAuthResultInfo = [NSMutableDictionary dictionaryWithDictionary:self.oAuthResultInfo];
             
-            NSDictionary *addition = @{@"+_access_token_invalid": @(is_access_token_invalid),
+            NSDictionary *addition = @{@"+_refresh_token_expires_in": @(self.oAuthStateMandatoryInvalidTimeInterval),
+                                       @"+_access_token_available": @(!is_access_token_invalid),
                                        @"+_access_token_durability_rate": @(kAccessTokenDurabilityRate),
                                        @"+_access_token_durability_timeInterval": @(access_token_durability_timeInterval),
                                        @"+_access_token_storage_date": self.access_token_storage_date,
@@ -268,15 +311,39 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
     }
     
     
+    
     // check if refresh_token exist or expired
-    if (self.refresh_token == nil || self.refresh_token_storage_date == nil) {
+    
+    BOOL is_refresh_token_invalid = NO;
+
+    if (self.refresh_token == nil) {
         
-        self.refresh_token_storage_date = systemDate;
         is_refresh_token_invalid = YES;
+        
+        self.refresh_token_storage_date = [NSDate distantPast];
+        
+        if (option == MROAuthStateCheckOptionCheckRefreshToken) {
+            
+            NSMutableDictionary *oAuthResultInfo = [NSMutableDictionary dictionaryWithDictionary:self.oAuthResultInfo];
+            
+            NSDictionary *addition = @{@"+_refresh_token_expires_in": @(self.oAuthStateMandatoryInvalidTimeInterval),
+                                       @"+_refresh_token_available": @(!is_refresh_token_invalid),
+                                       @"+_refresh_token_durability_rate": @(kRefreshTokenDurabilityRate),
+                                       @"+_refresh_token_durability_timeInterval": @(0),
+                                       @"+_refresh_token_storage_date": self.refresh_token_storage_date,
+                                       @"+_refresh_token_used_timeInterval": @(0),
+                                       @"+_refresh_token_usable_timeInterval": @(0)};
+            
+            [oAuthResultInfo setValuesForKeysWithDictionary:addition];
+            
+            *result = oAuthResultInfo;
+            
+        }
         
     } else {
         
-        NSTimeInterval refresh_token_durability_timeInterval = self.oAuthStateMandatoryInvalidTimeInterval * kRefreshTokenDurabilityRate;
+        NSTimeInterval refresh_token_durability_timeInterval = (self.oAuthStateMandatoryInvalidTimeInterval == 0 ?
+                                                                604800.0f : self.oAuthStateMandatoryInvalidTimeInterval) * kRefreshTokenDurabilityRate;
         
         NSTimeInterval refresh_token_used_timeInterval = systemDate.timeIntervalSinceReferenceDate - self.refresh_token_storage_date.timeIntervalSinceReferenceDate;
         
@@ -288,7 +355,8 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
             
             NSMutableDictionary *oAuthResultInfo = [NSMutableDictionary dictionaryWithDictionary:self.oAuthResultInfo];
             
-            NSDictionary *addition = @{@"+_refresh_token_invalid": @(is_refresh_token_invalid),
+            NSDictionary *addition = @{@"+_refresh_token_expires_in": @(self.oAuthStateMandatoryInvalidTimeInterval),
+                                       @"+_refresh_token_available": @(!is_refresh_token_invalid),
                                        @"+_refresh_token_durability_rate": @(kRefreshTokenDurabilityRate),
                                        @"+_refresh_token_durability_timeInterval": @(refresh_token_durability_timeInterval),
                                        @"+_refresh_token_storage_date": self.refresh_token_storage_date,

@@ -24,29 +24,46 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     
-    NSDictionary *report = nil;
+    [MRRequest setOAuthEnabled:YES];
+    [MRRequest setOAuthStatePeriodicCheckTimeInterval:1.0f];
+    [MRRequest setOAuthStateMandatoryInvalidTimeInterval:20];
     
-    if ([MRRequest checkOAuthAccessTokenStateAndExecutePresetMethodIfNeed:YES checkReport:&report]) {
-        
-        NSLog(@"access token invalid");
-        
-    } else {
+    // 模拟设置 OAuth 授权信息
+    NSDictionary *simulateOAuthInfo = @{@"access_token": @"123456789012345678",
+                                        @"refresh_token": @"000000000000000000",
+                                        @"expires_in": @(15)};
+    
+    [[MROAuthRequestManager defaultManager] updateOAuthArchiveWithResultDictionary:simulateOAuthInfo];
+    
+    NSDictionary *access_token_report = nil;
+    
+    if ([MRRequest checkOAuthAccessTokenStateAndExecutePresetMethodIfNeed:YES checkReport:&access_token_report]) {
         
         NSLog(@"access token available");
         
+    } else {
+        
+        NSLog(@"access token invalid");
+        
     }
     
-    NSLog(@"%@", report);
+    NSLog(@"access_token_report %@", access_token_report);
     
-    // 模拟设置 OAuth 授权信息
-    [[NSUserDefaults standardUserDefaults] setValue:@"123456789012345678" forKey:@"access_token"];
-    [[NSUserDefaults standardUserDefaults] setValue:@"000000000000000000" forKey:@"refresh_token"];
-    [[NSUserDefaults standardUserDefaults] setValue:@(30) forKey:@"expires_in"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    NSDictionary *refresh_token_report = nil;
     
-    [MRRequest setOAuthEnabled:YES];
-    [MRRequest setOAuthStateMandatoryInvalidTimeInterval:100.0f];
-    [MRRequest setOAuthStatePeriodicCheckTimeInterval:3.0f];
+    if ([MRRequest checkOAuthRefreshTokenStateAndExecutePresetMethodIfNeed:YES checkReport:&refresh_token_report]) {
+        
+        NSLog(@"refresh token available");
+        
+    } else {
+        
+        NSLog(@"refresh token invalid");
+        
+    }
+    
+    NSLog(@"refresh_token_report %@", refresh_token_report);
+    
+    
     
     [UIStoryboard setStoryboardNames:@[@"Main",
                                        @"LoginModule",

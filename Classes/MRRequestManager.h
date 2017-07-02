@@ -44,6 +44,8 @@ typedef NS_ENUM(NSUInteger, MROAuthStateCheckOption) {
 
 + (instancetype)defaultManager;
 
+- (void)updateOAuthArchiveWithResultDictionary:(NSDictionary *)dictionary;
+
 - (BOOL)checkOAuthStateAndExecutePresetMethodIfNeed:(id)sender checkOption:(MROAuthStateCheckOption)option checkResult:(NSDictionary **)result;
 
 @end
