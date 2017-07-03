@@ -25,45 +25,22 @@
     // Override point for customization after application launch.
     
     [MRRequest setOAuthEnabled:YES];
-    [MRRequest setOAuthStatePeriodicCheckTimeInterval:1.0f];
-    [MRRequest setOAuthStateMandatoryInvalidTimeInterval:20];
+    [MRRequest setOAuthInfoAutodestructTimeInterval:60.0f];
+    [MRRequest setOAuthStatePeriodicCheckTimeInterval:5.0f];
     
-    // 模拟设置 OAuth 授权信息
-    NSDictionary *simulateOAuthInfo = @{@"access_token": @"123456789012345678",
-                                        @"refresh_token": @"000000000000000000",
-                                        @"expires_in": @(15)};
-    
-    [[MROAuthRequestManager defaultManager] updateOAuthArchiveWithResultDictionary:simulateOAuthInfo];
-    
-    NSDictionary *access_token_report = nil;
-    
-    if ([MRRequest checkOAuthAccessTokenStateAndExecutePresetMethodIfNeed:YES checkReport:&access_token_report]) {
+    [MRRequest setOAuthAccessTokenAbnormalCustomPlanBlock:^{
         
-        NSLog(@"access token available");
+        NSLog(@"正在帮你刷新token");
         
-    } else {
-        
-        NSLog(@"access token invalid");
-        
-    }
+    } replaceOrKeepBoth:NO];
     
-    NSLog(@"access_token_report %@", access_token_report);
-    
-    NSDictionary *refresh_token_report = nil;
-    
-    if ([MRRequest checkOAuthRefreshTokenStateAndExecutePresetMethodIfNeed:YES checkReport:&refresh_token_report]) {
-        
-        NSLog(@"refresh token available");
-        
-    } else {
-        
-        NSLog(@"refresh token invalid");
-        
-    }
-    
-    NSLog(@"refresh_token_report %@", refresh_token_report);
-    
-    
+//    // 模拟设置 OAuth 授权信息
+//    NSDictionary *simulateOAuthInfo = @{@"access_token": @"123456789012345678",
+//                                        @"refresh_token": @"000000000000000000",
+//                                        @"expires_in": @(10)};
+//    
+//    [[MROAuthRequestManager defaultManager] updateOAuthArchiveWithResultDictionary:simulateOAuthInfo
+//                                                                      requestScope:MRRequestParameterOAuthRequestScopeRequestAccessToken];
     
     [UIStoryboard setStoryboardNames:@[@"Main",
                                        @"LoginModule",

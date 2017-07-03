@@ -80,26 +80,73 @@ typedef void(^Failure)(MRRequest *request, id requestObject, NSData *data, NSErr
 
 
 
-#pragma mark - default config
 
-@interface MRRequest (DefaultConfig)
+@interface MRRequest (Extension)
+
+@end
+
+
+
+@interface MRRequest (OAuthPublicMethod)
+
+#pragma mark - OAuth - 分析并返回oauth授权信息状态, 可以获得一份分析报告
 
 /**
- OAuth 当一次网络请求发起时, 是否对发出参数进行包装, 是否对返回结果进行处理
+ OAuth - 分析并返回 oauth token 状态, 可以获得一份分析报告
+ 
+ @param report 分析结果报告
+ @return oauth token 状态
+ */
++ (MROAuthTokenState)analyseOAuthTokenStateAndGenerateReport:(NSDictionary **)report;
+
+
+@end
+
+
+
+#pragma mark - OAuthSetting
+
+@interface MRRequest (OAuthSetting)
+
+#pragma mark - OAuth - oauth request 总开关
+
+/**
+ OAuth request 总开关
 
  @param enabled 是否开启, 默认关闭
  
  @Instructions: 当开启或关闭时, 会连锁的同步设置一系列开关
-                [setOAuthStatePeriodicCheckEnabled]
-                [setOAuthStateAfterOrdinaryBusinessRequestCheckEnabled]
-                [setOAuthAutoRefreshAccessTokenWhenNecessaryEnabled]
+ 
  *
  */
 + (void)setOAuthEnabled:(BOOL)enabled;
 + (BOOL)isOAuthEnabled;
 
+
+
+#pragma mark - OAuth - oauth授权信息自动销毁时间间隔
+
 /**
- OAuth 当获取到授权后, 是否周期性对授权的可用性(是否过期或即将过期)进行检查
+ OAuth - oauth授权信息自动销毁时间间隔
+
+ @param timeInterval 时间间隔, 如果不设置会设置为0, 则使用默认值 604800秒(7天)
+ 
+ @Instructions:     相当于 refresh_token 可用时长, 设置授权状态强制性失效的时间间隔, 当从获取到授权到下一次使用或检测的时间不小于该时间间隔,
+                    则会强制性的让授权失效(清空储存在NSUserdefault中的相关信息),
+                    如果你设置了回调方法会同时执行回调方法.
+                    如果你可以从其他途径或者从服务器来获取这个值, 那么当你在获取到之后需要进行设置, 否则请在使用前就进行设置,
+                    这个值是一种约定成俗的为了保证授权安全的前提下又不必频繁更新的技术手段, 可能是1周或者1个月, 也有可能不到5分钟.
+ *
+ */
++ (void)setOAuthInfoAutodestructTimeInterval:(NSTimeInterval)timeInterval;
++ (NSTimeInterval)oAuthInfoAutodestructTimeInterval;
+
+
+
+#pragma mark - OAuth - oauth授权信息周期性检查的开关
+
+/**
+ OAuth - oauth授权信息周期性检查的开关
 
  @param enabled 是否开启, 开关状态随着 isOAuthEnabled 同步, 可手动关闭
  
@@ -109,61 +156,60 @@ typedef void(^Failure)(MRRequest *request, id requestObject, NSData *data, NSErr
 + (void)setOAuthStatePeriodicCheckEnabled:(BOOL)enabled;
 + (BOOL)isOAuthStatePeriodicCheckEnabled;
 
+
+
+#pragma mark - OAuth - oauth授权信息周期性检查的时间间隔
+
 /**
- OAuth 设置周期性检查授权状态的时间间隔, 如果需要更新授权状态, 则执行本框架默认的更新方法
+ OAuth - oauth授权信息周期性检查的时间间隔
 
  @param timeInterval 时间间隔, 如果不设置或设置为0, 则使用默认值 25秒
  */
 + (void)setOAuthStatePeriodicCheckTimeInterval:(NSTimeInterval)timeInterval;
 + (NSTimeInterval)oAuthStatePeriodicCheckTimeInterval;
 
+
+
+#pragma mark - OAuth - 当一个oauth请求完成后是否检查oauth授权信息的开关
+
 /**
- OAuth 当普通(MRRequestParameterOAuthRequestScopeOrdinaryBusiness)的业务请求完成后, 是否对授权状态进行检查, 即检查凭证是否或即将过期
+ OAuth - 当一个oauth请求完成后是否检查 oauth授权信息的开关
 
  @param enabled 是否开启, 开关状态随着 isOAuthEnabled 同步, 可手动关闭
  */
 + (void)setOAuthStateAfterOrdinaryBusinessRequestCheckEnabled:(BOOL)enabled;
 + (BOOL)isOAuthStateAfterOrdinaryBusinessRequestCheckEnabled;
 
-/**
- OAuth 当进行了凭证状态检查后发现凭证即将过期或已过期时, 是否自动通过网络更新授权状态.
 
+
+#pragma mark - OAuth - 当oauth授权信息不正常时执行框架预设方案的开关
+
+/**
+ OAuth - 当oauth授权信息不正常时执行框架预设方案的开关(access_token 失效时自动修复和自定义方法, 当 refresh_token 失效时执行自定义方法)
+ 
  @param enabled 是否开启, 开关状态随着 isOAuthEnabled 同步, 可手动关闭
  */
-+ (void)setOAuthAutoRefreshAccessTokenWhenNecessaryEnabled:(BOOL)enabled;
-+ (BOOL)isOAuthAutoRefreshAccessTokenWhenNecessaryEnabled;
++ (void)setOAuthAutoExecuteTokenAbnormalPresetPlanEnabled:(BOOL)enabled;
++ (BOOL)isOAuthAutoExecuteTokenAbnormalPresetPlanEnabled;
+
+
+
+#pragma mark - oauth授权信息不正常自定义方案代码块
 
 /**
- OAuth  相当于 refresh_token 可用时长, 设置授权状态强制性失效的时间间隔, 当从获取到授权到下一次使用或检测的时间不小于该时间间隔, 则会强制性的让授权失效(清空储存在NSUserdefault中的相关信息),
-        如果你设置了回调方法会同时执行回调方法.
+ OAuth - access_token授权信息不正常自定义方案代码块, 可以选择与框架默认预设进行替换或者两者保留.
 
- @param timeInterval 时间间隔, 如果不设置会设置为0, 则使用默认值 604800秒(7天)
+ @param planBlock 代码块
+ @param replaceOrKeepBoth 如果 YES 则用 planBlock 替换掉框架默认预设方法, NO 则两者保留, 即既执行框架预设也执行 planBlock
+ */
++ (void)setOAuthAccessTokenAbnormalCustomPlanBlock:(dispatch_block_t)planBlock replaceOrKeepBoth:(BOOL)replaceOrKeepBoth;
+
+/**
+ OAuth - refresh_token授权信息不正常自定义方案代码块, 可以选择与框架默认预设进行替换或者两者保留.
  
- @Instructions: 如果你可以从其他途径或者从服务器来获取这个值, 那么当你在获取到之后需要进行设置, 否则请在使用前就进行设置, 
-                这个值是一种约定成俗的为了保证授权安全的前提下又不必频繁更新的技术手段, 可能是1周或者1个月, 也有可能不到5分钟.
- *
+ @param planBlock 代码块
+ @param replaceOrKeepBoth 如果 YES 则用 planBlock 替换掉框架默认预设方法, NO 则两者保留, 即既执行框架预设也执行 planBlock
  */
-+ (void)setOAuthStateMandatoryInvalidTimeInterval:(NSTimeInterval)timeInterval;
-+ (NSTimeInterval)oAuthStateMandatoryInvalidTimeInterval;
-
-
-/**
- 检查 OAuth access token 状态, 并且根据 ifNeed 决定是否执行预设方法
-
- @param ifNeed 是否执行预设方法
- @param report 检查报告
- @return access token 是否仍然可用
- */
-+ (BOOL)checkOAuthAccessTokenStateAndExecutePresetMethodIfNeed:(BOOL)ifNeed checkReport:(NSDictionary **)report;
-
-/**
- 检查 OAuth refresh token 状态, 并且根据 ifNeed 决定是否执行预设方法
- 
- @param ifNeed 是否执行预设方法
- @param report 检查报告
- @return refresh token 是否仍然可用
- */
-+ (BOOL)checkOAuthRefreshTokenStateAndExecutePresetMethodIfNeed:(BOOL)ifNeed checkReport:(NSDictionary **)report;
-
++ (void)setOAuthRefreshTokenAbnormalCustomPlanBlock:(dispatch_block_t)planBlock replaceOrKeepBoth:(BOOL)replaceOrKeepBoth;
 
 @end

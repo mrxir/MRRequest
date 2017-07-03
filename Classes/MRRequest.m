@@ -267,12 +267,26 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     
     // delegate success
     
+    if ([MRRequest isOAuthStatePeriodicCheckEnabled] == YES) {
+        
+        [[MROAuthRequestManager defaultManager] resumeOAuthStatePeriodicCheckTimer];
+        
+    }
+    
     
     if ([MRRequest isOAuthStateAfterOrdinaryBusinessRequestCheckEnabled] == YES) {
         
+        NSDictionary *report = nil;
         
+        [[MROAuthRequestManager defaultManager] analyseOAuthTokenStateAndGenerateReport:&report];
+        
+        if (report != nil) {
+            NSLog(@"%@", report);
+        }
         
     }
+    
+    [MROAuthRequestManager defaultManager].processingOAuthAbnormalPresetPlan = NO;
     
 
 }
@@ -482,7 +496,8 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
 
 - (void)handleOAuthResultDictionary
 {
-    [[MROAuthRequestManager defaultManager] updateOAuthArchiveWithResultDictionary:self.receiveObject];
+    [[MROAuthRequestManager defaultManager] updateOAuthArchiveWithResultDictionary:self.receiveObject
+                                                                      requestScope:self.parameter.oAuthRequestScope];
     
     [self succeeded];
 }
@@ -491,9 +506,30 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
 
 
 
-#pragma mark - default config
+@implementation MRRequest (Extension)
 
-@implementation MRRequest (DefaultConfig)
+@end
+
+
+
+@implementation MRRequest (OAuthPublicMethod)
+
+#pragma mark - OAuth - 分析并返回oauth授权信息状态, 可以获得一份分析报告
+
++ (MROAuthTokenState)analyseOAuthTokenStateAndGenerateReport:(NSDictionary *__autoreleasing *)report
+{
+    return [[MROAuthRequestManager defaultManager] analyseOAuthTokenStateAndGenerateReport:report];
+}
+
+@end
+
+
+
+#pragma mark - OAuthSetting
+
+@implementation MRRequest (OAuthSetting)
+
+#pragma mark - OAuth - oauth request 总开关
 
 + (void)setOAuthEnabled:(BOOL)enabled
 {
@@ -505,6 +541,24 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     return [MRRequestManager defaultManager].isOAuthEnabled;
 }
 
+
+
+#pragma mark - OAuth - oauth授权信息自动销毁时间间隔
+
++ (void)setOAuthInfoAutodestructTimeInterval:(NSTimeInterval)timeInterval
+{
+    [MROAuthRequestManager defaultManager].oAuthInfoAutodestructTimeInterval = timeInterval;
+}
+
++ (NSTimeInterval)oAuthInfoAutodestructTimeInterval
+{
+    return [MROAuthRequestManager defaultManager].oAuthInfoAutodestructTimeInterval;
+}
+
+
+
+#pragma mark - OAuth - oauth授权信息周期性检查的开关
+
 + (void)setOAuthStatePeriodicCheckEnabled:(BOOL)enabled
 {
     [MROAuthRequestManager defaultManager].oAuthStatePeriodicCheckEnabled = enabled;
@@ -514,6 +568,10 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
 {
     return [MROAuthRequestManager defaultManager].isOAuthStatePeriodicCheckEnabled;
 }
+
+
+
+#pragma mark - OAuth - oauth授权信息周期性检查的时间间隔
 
 + (void)setOAuthStatePeriodicCheckTimeInterval:(NSTimeInterval)timeInterval
 {
@@ -525,15 +583,9 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     return [MROAuthRequestManager defaultManager].oAuthStatePeriodicCheckTimeInterval;
 }
 
-+ (void)setOAuthAutoRefreshAccessTokenWhenNecessaryEnabled:(BOOL)enabled
-{
-    [MROAuthRequestManager defaultManager].oAuthautoRefreshAccessTokenWhenNecessaryEnabled = enabled;
-}
 
-+ (BOOL)isOAuthAutoRefreshAccessTokenWhenNecessaryEnabled
-{
-    return [MROAuthRequestManager defaultManager].isOAuthAutoRefreshAccessTokenWhenNecessaryEnabled;
-}
+
+#pragma mark - OAuth - 当一个oauth请求完成后是否检查oauth授权信息的开关
 
 + (void)setOAuthStateAfterOrdinaryBusinessRequestCheckEnabled:(BOOL)enabled
 {
@@ -545,29 +597,34 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     return [MROAuthRequestManager defaultManager].isOAuthStateAfterOrdinaryBusinessRequestCheckEnabled;
 }
 
-+ (void)setOAuthStateMandatoryInvalidTimeInterval:(NSTimeInterval)timeInterval
+
+
+#pragma mark - OAuth - 当oauth授权信息不正常时执行设方案的开关
+
++ (void)setOAuthAutoExecuteTokenAbnormalPresetPlanEnabled:(BOOL)enabled
 {
-    [MROAuthRequestManager defaultManager].oAuthStateMandatoryInvalidTimeInterval = timeInterval;
+    [MROAuthRequestManager defaultManager].oAuthAutoExecuteTokenAbnormalPresetPlanEnabled = enabled;
 }
 
-+ (NSTimeInterval)oAuthStateMandatoryInvalidTimeInterval
++ (BOOL)isOAuthAutoExecuteTokenAbnormalPresetPlanEnabled
 {
-    return [MROAuthRequestManager defaultManager].oAuthStateMandatoryInvalidTimeInterval;
+    return [MROAuthRequestManager defaultManager].isOAuthAutoExecuteTokenAbnormalPresetPlanEnabled;
 }
 
-+ (BOOL)checkOAuthAccessTokenStateAndExecutePresetMethodIfNeed:(BOOL)ifNeed checkReport:(NSDictionary **)report
+
+
+#pragma mark - oauth授权信息不正常自定义方案代码块
+
++ (void)setOAuthAccessTokenAbnormalCustomPlanBlock:(dispatch_block_t)planBlock replaceOrKeepBoth:(BOOL)replaceOrKeepBoth;
 {
-    return [[MROAuthRequestManager defaultManager] checkOAuthStateAndExecutePresetMethodIfNeed:@(ifNeed)
-                                                                                   checkOption:MROAuthStateCheckOptionCheckAccessToken
-                                                                                   checkResult:report];
+    [MROAuthRequestManager defaultManager].oAuthAccessTokenAbnormalCustomPlanBlock = planBlock;
+    [MROAuthRequestManager defaultManager].oAuthAccessTokenAbnormalCustomPlanBlockReplaceOrKeepBoth = replaceOrKeepBoth;
 }
 
-+ (BOOL)checkOAuthRefreshTokenStateAndExecutePresetMethodIfNeed:(BOOL)ifNeed checkReport:(NSDictionary **)report
++ (void)setOAuthRefreshTokenAbnormalCustomPlanBlock:(dispatch_block_t)planBlock replaceOrKeepBoth:(BOOL)replaceOrKeepBoth;
 {
-    return [[MROAuthRequestManager defaultManager] checkOAuthStateAndExecutePresetMethodIfNeed:@(ifNeed)
-                                                                                   checkOption:MROAuthStateCheckOptionCheckRefreshToken
-                                                                                   checkResult:report];
+    [MROAuthRequestManager defaultManager].oAuthRefreshTokenAbnormalCustomPlanBlock = planBlock;
+    [MROAuthRequestManager defaultManager].oAuthRefreshTokenAbnormalCustomPlanBlockReplaceOrKeepBoth = replaceOrKeepBoth;
 }
-
 
 @end
