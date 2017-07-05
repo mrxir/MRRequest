@@ -25,13 +25,23 @@
 
 
 typedef NS_ENUM(NSUInteger, MROAuthTokenState) {
-    MROAuthTokenStateBothInvalid,
-    MROAuthTokenStateBothAvailable,
-    MROAuthTokenStateOnlyAccessTokenAvailable,
-    MROAuthTokenStateOnlyRefreshTokenAvailable,
+    MROAuthTokenStateBothInvalid = 1,
+    MROAuthTokenStateBothAvailable = 2,
+    MROAuthTokenStateOnlyAccessTokenAvailable = 3,
+    MROAuthTokenStateOnlyRefreshTokenAvailable = 4,
 };
 
 @interface MROAuthRequestManager : MRRequestManager
+
+/**
+ 客户端ID
+ */
+@property (nonatomic, copy) NSString *clientId;
+
+/**
+ 客户端secret
+ */
+@property (nonatomic, copy) NSString *clientSecret;
 
 /**
  oauth授权信息自动销毁时间间隔

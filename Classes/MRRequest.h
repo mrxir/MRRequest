@@ -18,7 +18,6 @@ FOUNDATION_EXPORT NSErrorDomain const MRRequestErrorDomain;
 /**
  MRRequest 错误码
  
- - MRRequestErrorCodeGlobalInvalidJSONSerializationFormat:      通用错误码, 不可用的JSON序列化格式
  - MRRequestErrorCodeGlobalInProcessingSameRequest:             通用错误码, 正在处理相同请求
  - MRRequestErrorCodeOAuthOrdinaryBusinessTolerableFailed:      OAuth错误码, 可容忍的普通业务失败, 不需要重新登录
  - MRRequestErrorCodeOAuthOrdinaryBusinessIntolerableFailed:    OAuth错误码, 不可容忍的普通业务失败, 需要重新登录
@@ -27,13 +26,14 @@ FOUNDATION_EXPORT NSErrorDomain const MRRequestErrorDomain;
  */
 typedef NS_ENUM(NSUInteger, MRRequestErrorCode) {
     
-    MRRequestErrorCodeGlobalInvalidJSONSerializationFormat      = 7782000,
+    
     MRRequestErrorCodeGlobalInProcessingSameRequest             = 7782001,
     
     MRRequestErrorCodeOAuthOrdinaryBusinessTolerableFailed      = 7782002,
     MRRequestErrorCodeOAuthOrdinaryBusinessIntolerableFailed    = 7782003,
     MRRequestErrorCodeOAuthRequestAccessTokenFailed             = 7782004,
     MRRequestErrorCodeOAuthRefreshAccessTokenFailed             = 7782005,
+    MRRequestErrorCodeOAuthCredentialsConfigError               = 7782444,
     
 };
 
@@ -89,6 +89,18 @@ typedef void(^Failure)(MRRequest *request, id requestObject, NSData *data, NSErr
 
 @interface MRRequest (OAuthPublicMethod)
 
+
+/**
+ 开启oauth请求
+
+ @param clientId 客户端ID
+ @param clientSecret 客户端密钥
+ @param autodestructTimeInterval 凭证自动销毁时间间隔
+ @param error 开启失败的错误信息
+ @return 是否开启成功
+ */
++ (BOOL)enableOAuthRequestWithClientId:(NSString *)clientId clientSecret:(NSString *)clientSecret autodestructTimeInterval:(NSTimeInterval)autodestructTimeInterval anyError:(NSError **)error;
+
 #pragma mark - OAuth - 分析并返回oauth授权信息状态, 可以获得一份分析报告
 
 /**
@@ -124,12 +136,31 @@ typedef void(^Failure)(MRRequest *request, id requestObject, NSData *data, NSErr
 
 
 
+#pragma mark - OAuth - 设置oauth客户端凭证信息
+
+/**
+ OAuth - 设置oauth客户端ID
+
+ @param clientId ID
+ */
++ (void)setOAuthClientId:(NSString *)clientId;
++ (NSString *)oAuthClientId;
+
+/**
+ OAuth - 设置oauth客户端密钥
+
+ @param secret 密钥
+ */
++ (void)setOAuthClientSecret:(NSString *)secret;
++ (NSString *)oAuthClientSecret;
+
+
 #pragma mark - OAuth - oauth授权信息自动销毁时间间隔
 
 /**
  OAuth - oauth授权信息自动销毁时间间隔
 
- @param timeInterval 时间间隔, 如果不设置会设置为0, 则使用默认值 604800秒(7天)
+ @param timeInterval 时间间隔
  
  @Instructions:     相当于 refresh_token 可用时长, 设置授权状态强制性失效的时间间隔, 当从获取到授权到下一次使用或检测的时间不小于该时间间隔,
                     则会强制性的让授权失效(清空储存在NSUserdefault中的相关信息),

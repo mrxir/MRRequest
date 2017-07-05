@@ -8,6 +8,10 @@
 
 #import "MRRequestManager.h"
 
+#import "MRRequest.h"
+
+#import <MRFramework/NSString+Extension.h>
+
 @class MROAuthRequestManager;
 
 @implementation MRRequestManager
@@ -34,17 +38,49 @@
 
 - (void)setOAuthEnabled:(BOOL)oAuthEnabled
 {
-    _oAuthEnabled = oAuthEnabled;
+    BOOL shouldEnabled = NO;
     
-    [MROAuthRequestManager defaultManager].oAuthInfoAutodestructTimeInterval =
-    ([MROAuthRequestManager defaultManager].oAuthInfoAutodestructTimeInterval == 0 ?
-     604800.0f : [MROAuthRequestManager defaultManager].oAuthInfoAutodestructTimeInterval);
+    NSString *clientId = [MROAuthRequestManager defaultManager].clientId;
+    NSString *clientSecret = [MROAuthRequestManager defaultManager].clientSecret;
+    NSTimeInterval autodestructTimeInterval = [MROAuthRequestManager defaultManager].oAuthInfoAutodestructTimeInterval;
     
-    [MROAuthRequestManager defaultManager].oAuthStatePeriodicCheckEnabled = _oAuthEnabled;
+    if ([NSString isValidString:clientId] && [NSString isValidString:clientSecret]) {
+        
+        if (clientId.length >= 6 && clientSecret.length >= 6) {
+            
+            if (autodestructTimeInterval >= 10) {
+                
+                shouldEnabled = YES;
+                
+            }
+            
+        }
+        
+    }
     
-    [MROAuthRequestManager defaultManager].oAuthStateAfterOrdinaryBusinessRequestCheckEnabled = _oAuthEnabled;
-    
-    [MROAuthRequestManager defaultManager].oAuthAutoExecuteTokenAbnormalPresetPlanEnabled = _oAuthEnabled;
+    if (shouldEnabled == NO) {
+        
+        NSError *error = [NSError errorWithDomain:MRRequestErrorDomain
+                                             code:MRRequestErrorCodeOAuthCredentialsConfigError
+                                         userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"客户端凭证有误, 请检查 😨", nil),
+                                                    @"credentials": @{@"clientId": [NSString stringWithFormat:@"%@", clientId],
+                                                                      @"clientSecret": [NSString stringWithFormat:@"%@", clientSecret],
+                                                                      @"autodestructTimeInterval": @(autodestructTimeInterval)}}];
+        
+        NSLog(@"%@", error);
+
+        
+    } else {
+        
+        _oAuthEnabled = oAuthEnabled;
+        
+        [MROAuthRequestManager defaultManager].oAuthInfoAutodestructTimeInterval = autodestructTimeInterval;
+        [MROAuthRequestManager defaultManager].oAuthStatePeriodicCheckEnabled = _oAuthEnabled;
+        [MROAuthRequestManager defaultManager].oAuthStateAfterOrdinaryBusinessRequestCheckEnabled = _oAuthEnabled;
+        [MROAuthRequestManager defaultManager].oAuthAutoExecuteTokenAbnormalPresetPlanEnabled = _oAuthEnabled;
+        
+        
+    }
 }
 
 
@@ -69,13 +105,17 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
 
 @implementation MROAuthRequestManager
 
-@synthesize oAuthInfoAutodestructTimeInterval = _oAuthInfoAutodestructTimeInterval;
-
-@synthesize oAuthStatePeriodicCheckTimeInterval = _oAuthStatePeriodicCheckTimeInterval;
-
-@synthesize oAuthStatePeriodicCheckTimer = _oAuthStatePeriodicCheckTimer;
-
 #pragma mark - rewrite setter
+
+- (void)setClientId:(NSString *)clientId
+{
+    [MROAuthRequestManager setValue:clientId forKey:@"clientId"];
+}
+
+- (void)setClientSecret:(NSString *)clientSecret
+{
+    [MROAuthRequestManager setValue:clientSecret forKey:@"clientSecret"];
+}
 
 - (void)setOAuthResultInfo:(NSDictionary *)oAuthResultInfo
 {
@@ -134,14 +174,14 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
 
 #pragma mark - rewrite getter
 
-- (NSTimeInterval)oAuthInfoAutodestructTimeInterval
+- (NSString *)clientId
 {
-    return (_oAuthInfoAutodestructTimeInterval == 0 ? 604800.0f : _oAuthInfoAutodestructTimeInterval);
+    return [MROAuthRequestManager valueForKey:@"clientId"];
 }
 
-- (NSTimeInterval)oAuthStatePeriodicCheckTimeInterval
+- (NSString *)clientSecret
 {
-    return (_oAuthStatePeriodicCheckTimeInterval == 0 ? 25.0f : _oAuthStatePeriodicCheckTimeInterval);
+    return [MROAuthRequestManager valueForKey:@"clientSecret"];
 }
 
 - (NSTimer *)oAuthStatePeriodicCheckTimer
@@ -205,7 +245,6 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
 
 - (void)updateOAuthArchiveWithResultDictionary:(NSDictionary *)dictionary requestScope:(MRRequestParameterOAuthRequestScope)scope;
 {
-    NSLog(@"%s", __FUNCTION__);
     
     self.oAuthResultInfo = dictionary;
     
@@ -249,6 +288,7 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
  */
 - (MROAuthTokenState)analyseOAuthTokenStateAndGenerateReport:(NSDictionary *__autoreleasing *)report
 {
+    
     NSDate *date = [NSDate date];
     
     // analyse access token
@@ -337,17 +377,19 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
         
         [analysisInfo setValue:refreshTokenInfo forKey:@"oAuthReportRefreshTokenInfo"];
         
+        NSString *accessMark = isAccessInvalid == YES ? @"🚫" : @"✅";
+        
+        NSString *refreshMark = isRefreshInvalid == YES ? @"🚫" : @"✅";
+        
+        NSLog(@"AK %010.2fs / %010.2fs %@ RK %010.2fs / %010.2fs %@",
+              access_token_used_timeInterval, access_token_durability_timeInterval, accessMark,
+              refresh_token_used_timeInterval, refresh_token_durability_timeInterval, refreshMark);
+        
         *report = analysisInfo;
         
     }
     
-    NSString *accessMark = isAccessInvalid == YES ? @"🚫" : @"✅";
     
-    NSString *refreshMark = isRefreshInvalid == YES ? @"🚫" : @"✅";
-    
-    NSLog(@"AK %010.2fs / %010.2fs %@ RK %010.2fs / %010.2fs %@",
-          access_token_used_timeInterval, access_token_durability_timeInterval, accessMark,
-          refresh_token_used_timeInterval, refresh_token_durability_timeInterval, refreshMark);
     
     // result
     
@@ -429,7 +471,9 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
 
 - (void)didCallOAuthStatePeriodicCheckWithTimer:(NSTimer *)timer
 {
-    [self analyseOAuthTokenStateAndGenerateReport:nil];
+    NSDictionary *report = nil;
+    [self analyseOAuthTokenStateAndGenerateReport:&report];
+    report = nil;
 }
 
 - (void)resumeOAuthStatePeriodicCheckTimer

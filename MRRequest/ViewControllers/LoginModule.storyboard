@@ -340,16 +340,28 @@
                                                 </userDefinedRuntimeAttribute>
                                             </userDefinedRuntimeAttributes>
                                         </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HPT-Yn-ttM">
+                                            <rect key="frame" x="10" y="346" width="355" height="44"/>
+                                            <color key="backgroundColor" red="0.94959330558776855" green="0.53215226583877429" blue="0.3190562486885416" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="44" id="EOw-cD-kWs"/>
+                                            </constraints>
+                                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <state key="normal" title="压力测试"/>
+                                        </button>
                                     </subviews>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     <constraints>
                                         <constraint firstItem="n3B-h8-UtZ" firstAttribute="leading" secondItem="HNR-t3-J0l" secondAttribute="leading" constant="10" id="4bW-Bk-cWh"/>
+                                        <constraint firstItem="HPT-Yn-ttM" firstAttribute="leading" secondItem="HNR-t3-J0l" secondAttribute="leading" constant="10" id="5Wz-hP-3n1"/>
                                         <constraint firstAttribute="trailing" secondItem="HYN-Th-T4n" secondAttribute="trailing" constant="10" id="8DR-mI-ZRA"/>
                                         <constraint firstAttribute="trailing" secondItem="n3B-h8-UtZ" secondAttribute="trailing" constant="10" id="Ata-Ls-p5G"/>
                                         <constraint firstItem="HYN-Th-T4n" firstAttribute="leading" secondItem="HNR-t3-J0l" secondAttribute="leading" constant="10" id="GAz-vr-6NF"/>
                                         <constraint firstItem="NRN-Rv-Xx3" firstAttribute="top" secondItem="HNR-t3-J0l" secondAttribute="top" constant="10" id="Oj4-L5-hHv"/>
                                         <constraint firstItem="n3B-h8-UtZ" firstAttribute="top" secondItem="HYN-Th-T4n" secondAttribute="bottom" constant="20" id="S4Y-dF-4g6"/>
                                         <constraint firstItem="NRN-Rv-Xx3" firstAttribute="leading" secondItem="HNR-t3-J0l" secondAttribute="leading" constant="10" id="TK2-SW-BTu"/>
+                                        <constraint firstAttribute="trailing" secondItem="HPT-Yn-ttM" secondAttribute="trailing" constant="10" id="XHW-Y7-7aQ"/>
+                                        <constraint firstAttribute="bottom" secondItem="HPT-Yn-ttM" secondAttribute="bottom" constant="10" id="g5O-A3-ZQL"/>
                                         <constraint firstItem="HYN-Th-T4n" firstAttribute="top" secondItem="NRN-Rv-Xx3" secondAttribute="bottom" constant="10" id="nw6-ag-n4s"/>
                                         <constraint firstAttribute="trailing" secondItem="NRN-Rv-Xx3" secondAttribute="trailing" constant="10" id="yvv-de-VXd"/>
                                     </constraints>
@@ -376,6 +388,7 @@
                         <outlet property="fillItem" destination="iF6-Qg-4IM" id="9lD-Kz-b2k"/>
                         <outlet property="loginButton" destination="n3B-h8-UtZ" id="UTK-UR-9hI"/>
                         <outlet property="passwordField" destination="HYN-Th-T4n" id="XWV-Jd-xB5"/>
+                        <outlet property="pressureTestButton" destination="HPT-Yn-ttM" id="S9c-qG-H6A"/>
                         <outlet property="resetItem" destination="lJ4-Cj-siY" id="iCW-y6-6Jq"/>
                         <outlet property="tableHeaderView" destination="HNR-t3-J0l" id="OC9-Dp-Zqi"/>
                         <outlet property="usernameField" destination="NRN-Rv-Xx3" id="6z2-Ip-SOX"/>

@@ -28,6 +28,8 @@
 
 @property (weak, nonatomic) IBOutlet UIButton *loginButton;
 
+@property (weak, nonatomic) IBOutlet UIButton *pressureTestButton;
+
 @property (nonatomic, strong) NSMutableDictionary *loginInfo;
 
 
@@ -38,8 +40,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    
-    [[MROAuthRequestManager defaultManager] setValue:@"value" forKey:@"key"];
     
     self.loginInfo = [NSMutableDictionary dictionary];
     
@@ -54,17 +54,23 @@
     // 登录
     [self.loginButton handleWithEvents:UIControlEventTouchUpInside completion:^(__kindof UIControl *control) {
         
+        self.loginInfo[@"username"] = self.usernameField.text;
+        self.loginInfo[@"password"] = self.passwordField.text;
+        
         MRRequestParameter *parameter = [[MRRequestParameter alloc] initWithObject:self.loginInfo];
         
+        parameter.oAuthIndependentSwitchState = YES;
         parameter.oAuthRequestScope = MRRequestParameterOAuthRequestScopeRequestAccessToken;
+        parameter.requestMethod = MRRequestParameterRequestMethodPost;
+        parameter.formattedStyle = MRRequestParameterFormattedStyleForm;
         
         [SVProgressHUD showWithStatus:@"正在登录..."];
         
-        [SVProgressHUD dismissWithDelay:3];
-        
         [MRRequest requestWithPath:path parameter:parameter success:^(MRRequest *request, id receiveObject) {
             
-            NSLog(@"%@", receiveObject);
+            [SVProgressHUD dismiss];
+            
+            NSLog(@"receiveObject %@", receiveObject);
             
         } failure:^(MRRequest *request, id requestObject, NSData *data, NSError *error) {
             
@@ -72,7 +78,45 @@
                 
                 [SVProgressHUD showErrorWithStatus:@"用户名或密码错误"];
                 
+            } else {
+                
+                [SVProgressHUD showErrorWithStatus:error.localizedDescription];
+                
             }
+            
+        }];
+        
+        
+    }];
+    
+    
+    [self.pressureTestButton handleWithEvents:UIControlEventTouchUpInside completion:^(__kindof UIControl *control) {
+        
+        
+        [NSTimer scheduledTimerWithTimeInterval:0.05 repeats:YES block:^(NSTimer * _Nonnull timer) {
+            
+            self.loginInfo[@"username"] = self.usernameField.text;
+            self.loginInfo[@"password"] = self.passwordField.text;
+            
+            MRRequestParameter *parameter = [[MRRequestParameter alloc] initWithObject:self.loginInfo];
+            
+            parameter.oAuthRequestScope = MRRequestParameterOAuthRequestScopeRequestAccessToken;
+            parameter.requestMethod = MRRequestParameterRequestMethodPost;
+            parameter.formattedStyle = MRRequestParameterFormattedStyleForm;
+            
+            [MRRequest requestWithPath:path parameter:parameter success:^(MRRequest *request, id receiveObject) {
+                
+                NSLog(@"%@", receiveObject);
+                
+            } failure:^(MRRequest *request, id requestObject, NSData *data, NSError *error) {
+                
+                if (error.code == MRRequestErrorCodeOAuthRequestAccessTokenFailed) {
+                    
+                    [SVProgressHUD showErrorWithStatus:@"用户名或密码错误"];
+                    
+                }
+                
+            }];
             
         }];
         

@@ -24,23 +24,49 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     
-    [MRRequest setOAuthEnabled:YES];
+    /* 开启方式:1 */
+    NSError *error = nil;
+    BOOL enabled = [MRRequest enableOAuthRequestWithClientId:@"123456"
+                                                clientSecret:@"000000"
+                                    autodestructTimeInterval:60.0f
+                                                    anyError:&error];
+    if (!enabled) {
+        NSLog(@"OAuth开启失败!");
+        NSLog(@"%@", error);
+    } else {
+        NSLog(@"OAuth开启成功");
+        
+        [MRRequest setOAuthStatePeriodicCheckTimeInterval:5];
+        NSLog(@"OAuth 每 %02.2f 秒检查一次状态", [MRRequest oAuthStatePeriodicCheckTimeInterval]);
+        
+        [MRRequest setOAuthAccessTokenAbnormalCustomPlanBlock:^{
+            NSLog(@"我是自定义access_token失效预案方法");
+        } replaceOrKeepBoth:NO];
+        [MRRequest setOAuthRefreshTokenAbnormalCustomPlanBlock:^{
+            NSLog(@"我是自定义refresh_token失效预案方法");
+        } replaceOrKeepBoth:NO];
+        
+        
+    }
+    
+    
+    
+    /* 开启方式:2 */
+    /*
+    [MRRequest setOAuthClientId:@"123456"];
+    [MRRequest setOAuthClientSecret:@"000000"];
     [MRRequest setOAuthInfoAutodestructTimeInterval:60.0f];
-    [MRRequest setOAuthStatePeriodicCheckTimeInterval:5.0f];
-    
+    [MRRequest setOAuthEnabled:YES];
+    [MRRequest setOAuthStatePeriodicCheckTimeInterval:5];
     [MRRequest setOAuthAccessTokenAbnormalCustomPlanBlock:^{
-        
-        NSLog(@"正在帮你刷新token");
-        
+        NSLog(@"access_token失效时执行我");
     } replaceOrKeepBoth:NO];
+    [MRRequest setOAuthRefreshTokenAbnormalCustomPlanBlock:^{
+        NSLog(@"refresh_token失效时执行我");
+    } replaceOrKeepBoth:NO];
+     */
     
-//    // 模拟设置 OAuth 授权信息
-//    NSDictionary *simulateOAuthInfo = @{@"access_token": @"123456789012345678",
-//                                        @"refresh_token": @"000000000000000000",
-//                                        @"expires_in": @(10)};
-//    
-//    [[MROAuthRequestManager defaultManager] updateOAuthArchiveWithResultDictionary:simulateOAuthInfo
-//                                                                      requestScope:MRRequestParameterOAuthRequestScopeRequestAccessToken];
+    
     
     [UIStoryboard setStoryboardNames:@[@"Main",
                                        @"LoginModule",

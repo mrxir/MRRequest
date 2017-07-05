@@ -233,6 +233,8 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
 {
     NSLog(@"%s", __FUNCTION__);
     
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    
     [self.connection cancel];
 }
 
@@ -267,36 +269,90 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     
     // delegate success
     
-    if ([MRRequest isOAuthStatePeriodicCheckEnabled] == YES) {
-        
-        [[MROAuthRequestManager defaultManager] resumeOAuthStatePeriodicCheckTimer];
-        
-    }
-    
-    
-    if ([MRRequest isOAuthStateAfterOrdinaryBusinessRequestCheckEnabled] == YES) {
-        
-        NSDictionary *report = nil;
-        
-        [[MROAuthRequestManager defaultManager] analyseOAuthTokenStateAndGenerateReport:&report];
-        
-        if (report != nil) {
-            NSLog(@"%@", report);
-        }
-        
-    }
-    
-    [MROAuthRequestManager defaultManager].processingOAuthAbnormalPresetPlan = NO;
-    
 
 }
 
 - (void)dealloc
 {
-    NSLog(@"%s", __FUNCTION__);
+    
 }
 
 #pragma mark - NSURLConnectionDataDelegate
+
+/*
+ {(
+ "not found",
+ "unsupported version",
+ "payment required",
+ "proxy authentication required",
+ forbidden,
+ "reset content",
+ created,
+ "gateway timed out",
+ conflict,
+ "partial content",
+ "no content",
+ informational,
+ "not modified",
+ redirected,
+ continue,
+ "requested URL too long",
+ "no error",
+ unimplemented,
+ "length required",
+ "bad request",
+ "service unavailable",
+ "method not allowed",
+ "request too large",
+ "unsupported media type",
+ "client error",
+ found,
+ "switching protocols",
+ "multiple choices",
+ "no longer exists",
+ "moved permanently",
+ "server error",
+ "request timed out",
+ "requested range not satisfiable",
+ "expectation failed",
+ unauthorized,
+ accepted,
+ "precondition failed",
+ "needs proxy",
+ "internal server error",
+ "bad gateway",
+ "temporarily redirected",
+ "see other",
+ success,
+ unacceptable,
+ "non-authoritative information"
+ )}
+ */
+
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
+{
+   NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+    
+    if ([httpResponse isKindOfClass:[NSHTTPURLResponse class]]) {
+        
+        NSInteger statusCode = httpResponse.statusCode;
+        
+        if (statusCode != 200) {
+            
+            NSError *error = [NSError errorWithDomain:MRRequestErrorDomain
+                                                 code:statusCode
+                                             userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString([NSHTTPURLResponse localizedStringForStatusCode:statusCode], nil)}];
+            
+            [self exit];
+            
+            self.anyError = error;
+
+            [self failed];
+            
+        }
+        
+    }
+}
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
@@ -355,6 +411,17 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
             
             [self succeeded];
             
+            if ([MRRequest isOAuthStatePeriodicCheckEnabled] == YES) {
+                [[MROAuthRequestManager defaultManager] resumeOAuthStatePeriodicCheckTimer];
+            }
+            
+            
+            if ([MRRequest isOAuthStateAfterOrdinaryBusinessRequestCheckEnabled] == YES) {
+                [[MROAuthRequestManager defaultManager] analyseOAuthTokenStateAndGenerateReport:nil];
+            }
+            
+            [MROAuthRequestManager defaultManager].processingOAuthAbnormalPresetPlan = NO;
+            
         } else {
             
             NSError *error = nil;
@@ -367,7 +434,21 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
                 
             } else {
                 
-                [self handleOAuthResultDictionary];
+                [[MROAuthRequestManager defaultManager] updateOAuthArchiveWithResultDictionary:self.receiveObject
+                                                                                  requestScope:self.parameter.oAuthRequestScope];
+                
+                [self succeeded];
+                
+                if ([MRRequest isOAuthStatePeriodicCheckEnabled] == YES) {
+                    [[MROAuthRequestManager defaultManager] resumeOAuthStatePeriodicCheckTimer];
+                }
+                
+                
+                if ([MRRequest isOAuthStateAfterOrdinaryBusinessRequestCheckEnabled] == YES) {
+                    [[MROAuthRequestManager defaultManager] analyseOAuthTokenStateAndGenerateReport:nil];
+                }
+                
+                [MROAuthRequestManager defaultManager].processingOAuthAbnormalPresetPlan = NO;
                 
             }
             
@@ -418,7 +499,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
         
     }
     
-    if (oAuthErrorCode != nil || oAuthErrorReason != nil) {
+    if (exception != nil || oAuthErrorCode != nil || oAuthErrorReason != nil) {
         
         oAuthErrorCode = [NSString stringWithFormat:@"%@", oAuthErrorCode];
         oAuthErrorReason = [NSString stringWithFormat:@"%@", oAuthErrorReason];
@@ -494,14 +575,6 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     
 }
 
-- (void)handleOAuthResultDictionary
-{
-    [[MROAuthRequestManager defaultManager] updateOAuthArchiveWithResultDictionary:self.receiveObject
-                                                                      requestScope:self.parameter.oAuthRequestScope];
-    
-    [self succeeded];
-}
-
 @end
 
 
@@ -513,6 +586,46 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
 
 
 @implementation MRRequest (OAuthPublicMethod)
+
++ (BOOL)enableOAuthRequestWithClientId:(NSString *)clientId clientSecret:(NSString *)clientSecret autodestructTimeInterval:(NSTimeInterval)autodestructTimeInterval anyError:(NSError *__autoreleasing *)error
+{
+    BOOL enabled = NO;
+    
+    if ([NSString isValidString:clientId] && [NSString isValidString:clientSecret]) {
+        
+        if (clientId.length >= 6 && clientSecret.length >= 6) {
+            
+            if (autodestructTimeInterval >= 10) {
+                
+                enabled = YES;
+                
+                [MROAuthRequestManager defaultManager].clientId = clientId;
+                [MROAuthRequestManager defaultManager].clientSecret = clientSecret;
+                [MROAuthRequestManager defaultManager].oAuthInfoAutodestructTimeInterval = autodestructTimeInterval;
+                
+                [MRRequestManager defaultManager].oAuthEnabled = YES;
+                
+                
+            }
+            
+        }
+        
+    }
+    
+    if (error != nil) {
+        
+        *error = [NSError errorWithDomain:MRRequestErrorDomain
+                                     code:MRRequestErrorCodeOAuthCredentialsConfigError
+                                 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"客户端凭证有误, 请检查 😨", nil),
+                                            @"credentials": @{@"clientId": [NSString stringWithFormat:@"%@", clientId],
+                                                              @"clientSecret": [NSString stringWithFormat:@"%@", clientSecret],
+                                                              @"autodestructTimeInterval": @(autodestructTimeInterval)}}];
+
+        
+    }
+    
+    return enabled;
+}
 
 #pragma mark - OAuth - 分析并返回oauth授权信息状态, 可以获得一份分析报告
 
@@ -545,6 +658,26 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
 
 #pragma mark - OAuth - oauth授权信息自动销毁时间间隔
 
++ (void)setOAuthClientId:(NSString *)clientId
+{
+    [MROAuthRequestManager defaultManager].clientId = clientId;
+}
+
++ (NSString *)oAuthClientId
+{
+    return [MROAuthRequestManager defaultManager].clientId;
+}
+
++ (void)setOAuthClientSecret:(NSString *)secret
+{
+    [MROAuthRequestManager defaultManager].clientSecret = secret;
+}
+
++ (NSString *)oAuthClientSecret
+{
+    return [MROAuthRequestManager defaultManager].clientSecret;
+}
+
 + (void)setOAuthInfoAutodestructTimeInterval:(NSTimeInterval)timeInterval
 {
     [MROAuthRequestManager defaultManager].oAuthInfoAutodestructTimeInterval = timeInterval;
@@ -561,7 +694,12 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
 
 + (void)setOAuthStatePeriodicCheckEnabled:(BOOL)enabled
 {
-    [MROAuthRequestManager defaultManager].oAuthStatePeriodicCheckEnabled = enabled;
+    if ([MRRequestManager defaultManager].isOAuthEnabled == YES) {
+        [MROAuthRequestManager defaultManager].oAuthStatePeriodicCheckEnabled = enabled;
+    } else {
+        NSLog(@"oauth未开启, 无法设置 OAuthStatePeriodicCheckEnabled 😨");
+    }
+    
 }
 
 + (BOOL)isOAuthStatePeriodicCheckEnabled
@@ -575,7 +713,12 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
 
 + (void)setOAuthStatePeriodicCheckTimeInterval:(NSTimeInterval)timeInterval
 {
-    [MROAuthRequestManager defaultManager].oAuthStatePeriodicCheckTimeInterval = timeInterval;
+    if ([MRRequestManager defaultManager].isOAuthEnabled == YES) {
+        [MROAuthRequestManager defaultManager].oAuthStatePeriodicCheckTimeInterval = timeInterval;
+    } else {
+        NSLog(@"oauth未开启, 无法设置 OAuthStatePeriodicCheckTimeInterval 😨");
+    }
+    
 }
 
 + (NSTimeInterval)oAuthStatePeriodicCheckTimeInterval
@@ -589,7 +732,11 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
 
 + (void)setOAuthStateAfterOrdinaryBusinessRequestCheckEnabled:(BOOL)enabled
 {
-    [MROAuthRequestManager defaultManager].oAuthStateAfterOrdinaryBusinessRequestCheckEnabled = enabled;
+    if ([MRRequestManager defaultManager].isOAuthEnabled == YES) {
+        [MROAuthRequestManager defaultManager].oAuthStateAfterOrdinaryBusinessRequestCheckEnabled = enabled;
+    } else {
+        NSLog(@"oauth未开启, 无法设置 OAuthStateAfterOrdinaryBusinessRequestCheckEnabled 😨");
+    }
 }
 
 + (BOOL)isOAuthStateAfterOrdinaryBusinessRequestCheckEnabled
@@ -603,7 +750,11 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
 
 + (void)setOAuthAutoExecuteTokenAbnormalPresetPlanEnabled:(BOOL)enabled
 {
-    [MROAuthRequestManager defaultManager].oAuthAutoExecuteTokenAbnormalPresetPlanEnabled = enabled;
+    if ([MRRequestManager defaultManager].isOAuthEnabled == YES) {
+        [MROAuthRequestManager defaultManager].oAuthAutoExecuteTokenAbnormalPresetPlanEnabled = enabled;
+    } else {
+        NSLog(@"oauth未开启, 无法设置 OAuthAutoExecuteTokenAbnormalPresetPlanEnabled 😨");
+    }
 }
 
 + (BOOL)isOAuthAutoExecuteTokenAbnormalPresetPlanEnabled
@@ -617,14 +768,24 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
 
 + (void)setOAuthAccessTokenAbnormalCustomPlanBlock:(dispatch_block_t)planBlock replaceOrKeepBoth:(BOOL)replaceOrKeepBoth;
 {
-    [MROAuthRequestManager defaultManager].oAuthAccessTokenAbnormalCustomPlanBlock = planBlock;
-    [MROAuthRequestManager defaultManager].oAuthAccessTokenAbnormalCustomPlanBlockReplaceOrKeepBoth = replaceOrKeepBoth;
+    if ([MRRequestManager defaultManager].isOAuthEnabled == YES) {
+        [MROAuthRequestManager defaultManager].oAuthAccessTokenAbnormalCustomPlanBlock = planBlock;
+        [MROAuthRequestManager defaultManager].oAuthAccessTokenAbnormalCustomPlanBlockReplaceOrKeepBoth = replaceOrKeepBoth;
+    } else {
+        NSLog(@"oauth未开启, 无法设置 OAuthAccessTokenAbnormalCustomPlanBlock 😨");
+    }
+   
 }
 
 + (void)setOAuthRefreshTokenAbnormalCustomPlanBlock:(dispatch_block_t)planBlock replaceOrKeepBoth:(BOOL)replaceOrKeepBoth;
 {
-    [MROAuthRequestManager defaultManager].oAuthRefreshTokenAbnormalCustomPlanBlock = planBlock;
-    [MROAuthRequestManager defaultManager].oAuthRefreshTokenAbnormalCustomPlanBlockReplaceOrKeepBoth = replaceOrKeepBoth;
+    if ([MRRequestManager defaultManager].isOAuthEnabled == YES) {
+        [MROAuthRequestManager defaultManager].oAuthRefreshTokenAbnormalCustomPlanBlock = planBlock;
+        [MROAuthRequestManager defaultManager].oAuthRefreshTokenAbnormalCustomPlanBlockReplaceOrKeepBoth = replaceOrKeepBoth;
+    } else {
+        NSLog(@"oauth未开启, 无法设置 OAuthRefreshTokenAbnormalCustomPlanBlock 😨");
+    }
+    
 }
 
 @end

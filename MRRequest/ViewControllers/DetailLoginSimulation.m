@@ -70,15 +70,27 @@
     // 登录
     [self.loginButton handleWithEvents:UIControlEventTouchUpInside completion:^(__kindof UIControl *control) {
         
+        [self.loginInfo removeAllObjects];
+        
+        // insert map
+        self.loginInfo[@"client_id"]        = self.client_id_field.text;
+        self.loginInfo[@"client_secret"]    = self.client_secret_field.text;
+        self.loginInfo[@"grant_type"]       = self.grant_type_field.text;
+        self.loginInfo[@"username"]         = self.usernameField.text;
+        self.loginInfo[@"password"]         = self.passwordField.text;
+        self.loginInfo[@"format"]           = self.formatField.text;
+        self.loginInfo[@"timestamp"]        = self.timestampField.text;
+        
+        [self sign];
+        
         MRRequestParameter *parameter = [[MRRequestParameter alloc] initWithObject:self.loginInfo];
         
-        parameter.oAuthRequestScope = MRRequestParameterOAuthRequestScopeRequestAccessToken;
+        parameter.oAuthIndependentSwitchState = YES;
         parameter.requestMethod = MRRequestParameterRequestMethodPost;
         parameter.formattedStyle = MRRequestParameterFormattedStyleForm;
         
-        [SVProgressHUD showWithStatus:@"正在登录..."];
         
-        [SVProgressHUD dismissWithDelay:3];
+        [SVProgressHUD showWithStatus:@"正在登录..."];
 
         [MRRequest requestWithPath:self.serverAddressField.text parameter:parameter success:^(MRRequest *request, id receiveObject) {
             
@@ -88,13 +100,19 @@
             
         } failure:^(MRRequest *request, id requestObject, NSData *data, NSError *error) {
             
-            [SVProgressHUD showErrorWithStatus:error.localizedDescription];
+            if (error.code == MRRequestErrorCodeOAuthRequestAccessTokenFailed) {
+                
+                [SVProgressHUD showErrorWithStatus:@"用户名或密码错误"];
+                
+            } else {
+                
+                [SVProgressHUD showErrorWithStatus:error.localizedDescription];
+                
+            }
             
             self.resultTextView.text = error.description;
             
         }];
-        
-        
         
         
     }];
@@ -116,24 +134,8 @@
     [self.view endEditing:YES];
 }
 
-- (void)didClickFillItem:(UIBarButtonItem *)item
+- (void)sign
 {
-    // fill field
-    self.serverAddressField.text = @"http://10.0.40.119:8080/oauth/token?";
-    self.authValidDurationField.text = @"40";
-    
-    self.client_id_field.text = @"ff2ff059d245ae8cb378ab54a92e966d";
-    self.client_secret_field.text = @"01f32ac28d7b45e08932f11a958f1d9f";
-    self.grant_type_field.text = @"password";
-    
-    self.usernameField.text = @"abc123";
-    self.passwordField.text = @"123456";
-    
-    self.formatField.text = @"json";
-    self.timestampField.text = [_timestampDateFormatter stringFromDate:[NSDate date]];
-    
-    [self.loginInfo removeAllObjects];
-    
     // insert map
     self.loginInfo[@"client_id"]        = self.client_id_field.text;
     self.loginInfo[@"client_secret"]    = self.client_secret_field.text;
@@ -151,6 +153,23 @@
     self.loginInfo[@"sign"]             = sign;
     
     self.signField.text                 = sign;
+}
+
+- (void)didClickFillItem:(UIBarButtonItem *)item
+{
+    // fill field
+    self.serverAddressField.text = @"http://10.0.40.119:8080/oauth/token?";
+    self.authValidDurationField.text = @"40";
+    
+    self.client_id_field.text = @"ff2ff059d245ae8cb378ab54a92e966d";
+    self.client_secret_field.text = @"01f32ac28d7b45e08932f11a958f1d9f";
+    self.grant_type_field.text = @"password";
+    
+    self.usernameField.text = @"abc123";
+    self.passwordField.text = @"123456";
+    
+    self.formatField.text = @"json";
+    self.timestampField.text = [_timestampDateFormatter stringFromDate:[NSDate date]];
     
 }
 
