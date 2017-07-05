@@ -62,12 +62,26 @@
 
 - (NSString *)description
 {
-    NSMutableDictionary *description = [NSMutableDictionary dictionary];
+    NSMutableString *description = [NSMutableString string];
+    [description appendFormat:@"<%@: %p>", self.class, self];
     
-    description[@"source"] = self.source;
-    description[@"result"] = self.result;
+    NSMutableDictionary *property = [NSMutableDictionary dictionary];
+    property[@"isOAuthIndependentSwitchState"] = @(self.isOAuthIndependentSwitchState);
+    property[@"isOAuthIndependentSwitchHasBeenSetted"] = @(self.isOAuthIndependentSwitchHasBeenSetted);
+    property[@"oAuthRequestScope"] = @(self.oAuthRequestScope);
+    property[@"requestMethod"] = @(self.requestMethod);
+    property[@"formattedStyle"] = @(self.formattedStyle);
+    property[@"resultEncoding"] = @(self.resultEncoding);
+    property[@"sourcePrefix"] = self.sourcePrefix;
+    property[@"relativelyStableParameterString"] = self.relativelyStableParameterString;
+    property[@"identifier"] = self.identifier;
+    property[@"source"] = self.source;
+    property[@"result"] = [self.result isKindOfClass:[NSData class]] ? [self.result stringWithUTF8] : self.result;
     
-    return description.stringWithUTF8;
+    [description appendFormat:@" "];
+    [description appendFormat:@"%@", property.stringWithUTF8];
+    
+    return description;
 }
 
 
@@ -111,27 +125,57 @@
             
             // 根据 requestScope 判定应该增加哪些特定参数
             if (self.oAuthRequestScope == MRRequestParameterOAuthRequestScopeOrdinaryBusiness) {
-                oAuthDynamicParameter[@"access_token"]   = @"-access_token-";
+                
+                NSString *access_token = oAuthDynamicParameter[@"access_token"];
+                if (![NSString isValidString:access_token]) access_token = [MROAuthRequestManager defaultManager].access_token;
+                oAuthDynamicParameter[@"access_token"] = access_token;
+                
             }
             
             if (self.oAuthRequestScope == MRRequestParameterOAuthRequestScopeRequestAccessToken) {
-                oAuthDynamicParameter[@"client_id"]      = @"ff2ff059d245ae8cb378ab54a92e966d";
-                oAuthDynamicParameter[@"client_secret"]  = @"01f32ac28d7b45e08932f11a958f1d9f";
-                oAuthDynamicParameter[@"grant_type"]     = @"password";
+                
+                NSString *client_id = oAuthDynamicParameter[@"client_id"];
+                NSString *client_secret = oAuthDynamicParameter[@"client_secret"];
+                NSString *grant_type = oAuthDynamicParameter[@"grant_type"];
+                
+                if (![NSString isValidString:client_id]) client_id = [MROAuthRequestManager defaultManager].clientId;
+                if (![NSString isValidString:client_secret]) client_secret = [MROAuthRequestManager defaultManager].clientSecret;
+                if (![NSString isValidString:grant_type]) grant_type = @"password";
+                
+                oAuthDynamicParameter[@"client_id"]      = client_id;
+                oAuthDynamicParameter[@"client_secret"]  = client_secret;
+                oAuthDynamicParameter[@"grant_type"]     = grant_type;
+                
             }
             
             if (self.oAuthRequestScope == MRRequestParameterOAuthRequestScopeRefreshAccessToken) {
-                oAuthDynamicParameter[@"client_id"]      = @"ff2ff059d245ae8cb378ab54a92e966d";
-                oAuthDynamicParameter[@"client_secret"]  = @"01f32ac28d7b45e08932f11a958f1d9f";
-                oAuthDynamicParameter[@"refresh_token"]  = @"-refresh_token-";
-                oAuthDynamicParameter[@"grant_type"]     = @"refresh_token";
+                
+                NSString *client_id = oAuthDynamicParameter[@"client_id"];
+                NSString *client_secret = oAuthDynamicParameter[@"client_secret"];
+                NSString *refresh_token = oAuthDynamicParameter[@"refresh_token"];
+                NSString *grant_type = oAuthDynamicParameter[@"grant_type"];
+                
+                if (![NSString isValidString:client_id]) client_id = [MROAuthRequestManager defaultManager].clientId;
+                if (![NSString isValidString:client_secret]) client_secret = [MROAuthRequestManager defaultManager].clientSecret;
+                if (![NSString isValidString:refresh_token]) refresh_token = [MROAuthRequestManager defaultManager].refresh_token;
+                if (![NSString isValidString:grant_type]) grant_type = @"refresh_token";
+                
+                oAuthDynamicParameter[@"client_id"]      = client_id;
+                oAuthDynamicParameter[@"client_secret"]  = client_secret;
+                oAuthDynamicParameter[@"refresh_token"]  = refresh_token;
+                oAuthDynamicParameter[@"grant_type"]     = grant_type;
+                
             }
             
-            oAuthDynamicParameter[@"format"] = @"json";
+            NSString *format = oAuthDynamicParameter[@"format"];
+            if (![NSString isValidString:format]) format = @"json";
+            oAuthDynamicParameter[@"format"] = format;
             
             relativelyStableValidJSONObjectOrString = [NSDictionary dictionaryWithDictionary:oAuthDynamicParameter];
             
-            oAuthDynamicParameter[@"timestamp"] = [_timestampDateFormatter stringFromDate:[NSDate date]];
+            NSString *timestamp = oAuthDynamicParameter[@"timestamp"];
+            if (![NSString isValidString:timestamp]) timestamp = [_timestampDateFormatter stringFromDate:[NSDate date]];
+            oAuthDynamicParameter[@"timestamp"] = timestamp;
             
             // 使用非空的键值对进行签名
             NSMutableDictionary *notEmptyKeyValueMap = [NSMutableDictionary dictionaryWithDictionary:oAuthDynamicParameter];
@@ -142,7 +186,10 @@
                     }
                 }
             }];
-            oAuthDynamicParameter[@"sign"] = notEmptyKeyValueMap.formattedIntoFormStyleString.md5Hash;
+            
+            NSString *sign = oAuthDynamicParameter[@"sign"];
+            if (![NSString isValidString:sign]) sign = notEmptyKeyValueMap.formattedIntoFormStyleString.md5Hash;
+            oAuthDynamicParameter[@"sign"] = sign;
             
             validJSONObjectOrString = oAuthDynamicParameter;
             

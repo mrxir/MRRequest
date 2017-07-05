@@ -87,6 +87,26 @@ typedef void(^Failure)(MRRequest *request, id requestObject, NSData *data, NSErr
 
 
 
+@interface MRRequest (PublicConfig)
+
+/**
+ 设置日志级别
+
+ @param level 日志级别
+ 
+ @Instructions: MRRequest 的日志系统参考 Android 设计了级别并增加了 None 这一项.
+                从低到高是: Verbose, Debug, Info, Warning, Error, None
+                None级别下除了系统抛出的日志外, 你将看不见本框架任何日志信息, 不利于排查错误, 除非特殊需求, 否则不建议使用该级别.
+ 
+ *
+ */
++ (void)setLogLevel:(MRRequestLogLevel)level;
++ (MRRequestLogLevel)logLevel;
+
+@end
+
+
+
 @interface MRRequest (OAuthPublicMethod)
 
 

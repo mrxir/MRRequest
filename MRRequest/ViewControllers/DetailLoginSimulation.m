@@ -86,13 +86,15 @@
         MRRequestParameter *parameter = [[MRRequestParameter alloc] initWithObject:self.loginInfo];
         
         parameter.oAuthIndependentSwitchState = YES;
+        parameter.oAuthRequestScope = MRRequestParameterOAuthRequestScopeRequestAccessToken;
         parameter.requestMethod = MRRequestParameterRequestMethodPost;
         parameter.formattedStyle = MRRequestParameterFormattedStyleForm;
-        
         
         [SVProgressHUD showWithStatus:@"正在登录..."];
 
         [MRRequest requestWithPath:self.serverAddressField.text parameter:parameter success:^(MRRequest *request, id receiveObject) {
+            
+            NSLog(@"receiveObject %@", receiveObject);
             
             [SVProgressHUD dismiss];
             

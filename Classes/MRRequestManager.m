@@ -66,9 +66,9 @@
                                                     @"credentials": @{@"clientId": [NSString stringWithFormat:@"%@", clientId],
                                                                       @"clientSecret": [NSString stringWithFormat:@"%@", clientSecret],
                                                                       @"autodestructTimeInterval": @(autodestructTimeInterval)}}];
-        
-        NSLog(@"%@", error);
-
+        if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelError) {
+            NSLog(@"[OAUTH] %@", error);
+        }
         
     } else {
         
@@ -245,36 +245,30 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
 
 - (void)updateOAuthArchiveWithResultDictionary:(NSDictionary *)dictionary requestScope:(MRRequestParameterOAuthRequestScope)scope;
 {
-    
-    self.oAuthResultInfo = dictionary;
-    
-    NSDate *date = [NSDate date];
-    
-    NSDictionary *oAuthResultInfo = dictionary;
-    
-    self.access_token = oAuthResultInfo[@"access_token"];
-    
-    self.refresh_token = oAuthResultInfo[@"refresh_token"];
 
     // 获取 access_token
     if (scope == MRRequestParameterOAuthRequestScopeRequestAccessToken) {
         
-        self.access_token = oAuthResultInfo[@"access_token"];
+        NSDate *date = [NSDate date];
         
-        self.expires_in = oAuthResultInfo[@"expires_in"];
+        self.oAuthResultInfo = dictionary;
+        
+        self.expires_in = dictionary[@"expires_in"];
+        self.access_token = dictionary[@"access_token"];
+        self.refresh_token = dictionary[@"refresh_token"];
         
         self.access_token_storage_date = date;
-        
-        self.refresh_token = oAuthResultInfo[@"refresh_token"];
-        
         self.refresh_token_storage_date = date;
         
     // 刷新 access_token
     } else if (scope == MRRequestParameterOAuthRequestScopeRefreshAccessToken) {
         
-        self.access_token = oAuthResultInfo[@"access_token"];
+        NSDate *date = [NSDate date];
+
+        self.oAuthResultInfo = dictionary;
         
-        self.expires_in = oAuthResultInfo[@"expires_in"];
+        self.access_token = dictionary[@"access_token"];
+        self.expires_in = dictionary[@"expires_in"];
         
         self.access_token_storage_date = date;
         
@@ -377,19 +371,21 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
         
         [analysisInfo setValue:refreshTokenInfo forKey:@"oAuthReportRefreshTokenInfo"];
         
-        NSString *accessMark = isAccessInvalid == YES ? @"🚫" : @"✅";
-        
-        NSString *refreshMark = isRefreshInvalid == YES ? @"🚫" : @"✅";
-        
-        NSLog(@"AK %010.2fs / %010.2fs %@ RK %010.2fs / %010.2fs %@",
-              access_token_used_timeInterval, access_token_durability_timeInterval, accessMark,
-              refresh_token_used_timeInterval, refresh_token_durability_timeInterval, refreshMark);
-        
         *report = analysisInfo;
         
     }
     
-    
+    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelDebug) {
+        
+        NSString *accessMark = isAccessInvalid == YES ? @"🚫" : @"✅";
+        
+        NSString *refreshMark = isRefreshInvalid == YES ? @"🚫" : @"✅";
+        
+        NSLog(@"[OAUTH] AK %010.2fs / %010.2fs %@ RK %010.2fs / %010.2fs %@",
+              access_token_used_timeInterval, access_token_durability_timeInterval, accessMark,
+              refresh_token_used_timeInterval, refresh_token_durability_timeInterval, refreshMark);
+        
+    }
     
     // result
     
@@ -427,7 +423,9 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
                 if (self.isProcessingOAuthAbnormalPresetPlan == NO) {
                     [self executeCustomPresetPlanForAccessTokenAbnormal];
                 } else {
-                    NSLog(@"The oauth manager is processing oauth access token abnormal preset plan.");
+                    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelDebug) {
+                        NSLog(@"[OAUTH] The oauth manager is processing framework oauth access token abnormal preset plan now.");
+                    }
                 }
             }
             
@@ -445,7 +443,9 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
                     [self executeFrameworkPresetPlanForAccessTokenAbnormal];
                     [self executeCustomPresetPlanForAccessTokenAbnormal];
                 } else {
-                    NSLog(@"The oauth manager is processing oauth access token abnormal preset plan.");
+                    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelDebug) {
+                        NSLog(@"[OAUTH] The oauth manager is processing framework oauth access token abnormal preset plan now.");
+                    }
                 }
             }
             
@@ -490,14 +490,18 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
 
 - (void)executeFrameworkPresetPlanForAccessTokenAbnormal
 {
-    NSLog(@"执行框架预设_刷新授权信息");
+    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
+        NSLog(@"[OAUTH] 执行框架预设_刷新授权信息");
+    }
     
     self.processingOAuthAbnormalPresetPlan = YES;
 }
 
 - (void)executeFrameworkPresetPlanForRefreshTokenAbnormal
 {
-    NSLog(@"执行框架预设_销毁授权信息");
+    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
+        NSLog(@"[OAUTH] 执行框架预设_销毁授权信息");
+    }
     
     [self freezeOAuthStatePeriodicCheckTimer];
     
@@ -506,7 +510,9 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
 
 - (void)executeCustomPresetPlanForAccessTokenAbnormal
 {
-    NSLog(@"执行自定义access_token失效预案");
+    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
+        NSLog(@"[OAUTH] 执行自定义access_token失效预案");
+    }
     
     if (self.oAuthAccessTokenAbnormalCustomPlanBlock != nil) {
         self.oAuthAccessTokenAbnormalCustomPlanBlock();
@@ -515,7 +521,9 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
 
 - (void)executeCustomPresetPlanForRefreshTokenAbnormal
 {
-    NSLog(@"执行自定义refresh_token失效预案");
+    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
+        NSLog(@"[OAUTH] 执行自定义refresh_token失效预案");
+    }
     
     if (self.oAuthRefreshTokenAbnormalCustomPlanBlock != nil) {
         self.oAuthRefreshTokenAbnormalCustomPlanBlock();

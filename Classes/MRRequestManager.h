@@ -12,7 +12,18 @@
 
 #import "MRRequestParameter.h"
 
+typedef NS_ENUM(NSUInteger, MRRequestLogLevel) {
+    MRRequestLogLevelVerbose,
+    MRRequestLogLevelDebug,
+    MRRequestLogLevelInfo,
+    MRRequestLogLevelWarning,
+    MRRequestLogLevelError,
+    MRRequestLogLevelNone,
+};
+
 @interface MRRequestManager : NSObject
+
+@property (nonatomic, assign) MRRequestLogLevel logLevel;
 
 @property (nonatomic, strong, readonly) NSMutableSet *processingRequestIdentifierSet;
 

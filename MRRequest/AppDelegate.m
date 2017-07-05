@@ -24,6 +24,8 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     
+    [MRRequest setLogLevel:MRRequestLogLevelVerbose];
+    
     /* 开启方式:1 */
     NSError *error = nil;
     BOOL enabled = [MRRequest enableOAuthRequestWithClientId:@"123456"
@@ -42,6 +44,7 @@
         [MRRequest setOAuthAccessTokenAbnormalCustomPlanBlock:^{
             NSLog(@"我是自定义access_token失效预案方法");
         } replaceOrKeepBoth:NO];
+        
         [MRRequest setOAuthRefreshTokenAbnormalCustomPlanBlock:^{
             NSLog(@"我是自定义refresh_token失效预案方法");
         } replaceOrKeepBoth:NO];
@@ -52,19 +55,17 @@
     
     
     /* 开启方式:2 */
-    /*
-    [MRRequest setOAuthClientId:@"123456"];
-    [MRRequest setOAuthClientSecret:@"000000"];
-    [MRRequest setOAuthInfoAutodestructTimeInterval:60.0f];
-    [MRRequest setOAuthEnabled:YES];
-    [MRRequest setOAuthStatePeriodicCheckTimeInterval:5];
-    [MRRequest setOAuthAccessTokenAbnormalCustomPlanBlock:^{
-        NSLog(@"access_token失效时执行我");
-    } replaceOrKeepBoth:NO];
-    [MRRequest setOAuthRefreshTokenAbnormalCustomPlanBlock:^{
-        NSLog(@"refresh_token失效时执行我");
-    } replaceOrKeepBoth:NO];
-     */
+//    [MRRequest setOAuthClientId:@"123456"];
+//    [MRRequest setOAuthClientSecret:@"000000"];
+//    [MRRequest setOAuthInfoAutodestructTimeInterval:60.0f];
+//    [MRRequest setOAuthEnabled:YES];
+//    [MRRequest setOAuthStatePeriodicCheckTimeInterval:5];
+//    [MRRequest setOAuthAccessTokenAbnormalCustomPlanBlock:^{
+//        NSLog(@"access_token失效时执行我");
+//    } replaceOrKeepBoth:NO];
+//    [MRRequest setOAuthRefreshTokenAbnormalCustomPlanBlock:^{
+//        NSLog(@"refresh_token失效时执行我");
+//    } replaceOrKeepBoth:NO];
     
     
     
