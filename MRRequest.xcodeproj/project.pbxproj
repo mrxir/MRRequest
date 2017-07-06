@@ -14,14 +14,14 @@
 		670412C91F02039A005BDF55 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 670412C71F02039A005BDF55 /* LaunchScreen.storyboard */; };
 		670413D61F04D74B005BDF55 /* MRRequestParameter.m in Sources */ = {isa = PBXBuildFile; fileRef = 670413D51F04D74B005BDF55 /* MRRequestParameter.m */; };
 		670414171F04F00E005BDF55 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 670414161F04F00E005BDF55 /* RootViewController.m */; };
-		6704141A1F04F5CD005BDF55 /* LoginModule.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 670414191F04F5CD005BDF55 /* LoginModule.storyboard */; };
+		6704141A1F04F5CD005BDF55 /* OAuthRequest.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 670414191F04F5CD005BDF55 /* OAuthRequest.storyboard */; };
 		670414201F050EF8005BDF55 /* MRRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6704141F1F050EF8005BDF55 /* MRRequest.m */; };
 		670414231F0511EF005BDF55 /* MRRequestManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 670414221F0511EF005BDF55 /* MRRequestManager.m */; };
-		670414261F0538FF005BDF55 /* DetailLoginSimulation.m in Sources */ = {isa = PBXBuildFile; fileRef = 670414251F0538FF005BDF55 /* DetailLoginSimulation.m */; };
-		670414291F05391F005BDF55 /* BriefLoginSimulation.m in Sources */ = {isa = PBXBuildFile; fileRef = 670414281F05391F005BDF55 /* BriefLoginSimulation.m */; };
 		6704142B1F05DDAB005BDF55 /* Sections.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6704142A1F05DDAB005BDF55 /* Sections.plist */; };
-		670414331F05E01D005BDF55 /* BusinessQueriesModule.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 670414321F05E01D005BDF55 /* BusinessQueriesModule.storyboard */; };
+		670414331F05E01D005BDF55 /* CommonRequest.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 670414321F05E01D005BDF55 /* CommonRequest.storyboard */; };
 		670414361F05E05D005BDF55 /* WeatherQueryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 670414351F05E05D005BDF55 /* WeatherQueryController.m */; };
+		677576641F0DE45600715F6B /* RefreshAccessTokenController.m in Sources */ = {isa = PBXBuildFile; fileRef = 677576631F0DE45600715F6B /* RefreshAccessTokenController.m */; };
+		677576671F0DEAB900715F6B /* RequestAccessTokenController.m in Sources */ = {isa = PBXBuildFile; fileRef = 677576661F0DEAB900715F6B /* RequestAccessTokenController.m */; };
 		FE1F755BCE615014EF092A09 /* libPods-MRRequest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B58F8507383BFEB2C7C47D3 /* libPods-MRRequest.a */; };
 /* End PBXBuildFile section */
 
@@ -39,20 +39,20 @@
 		670413D51F04D74B005BDF55 /* MRRequestParameter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MRRequestParameter.m; sourceTree = "<group>"; };
 		670414151F04F00E005BDF55 /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
 		670414161F04F00E005BDF55 /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
-		670414191F04F5CD005BDF55 /* LoginModule.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LoginModule.storyboard; sourceTree = "<group>"; };
+		670414191F04F5CD005BDF55 /* OAuthRequest.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = OAuthRequest.storyboard; sourceTree = "<group>"; };
 		6704141E1F050EF8005BDF55 /* MRRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MRRequest.h; sourceTree = "<group>"; };
 		6704141F1F050EF8005BDF55 /* MRRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MRRequest.m; sourceTree = "<group>"; };
 		670414211F0511EF005BDF55 /* MRRequestManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MRRequestManager.h; sourceTree = "<group>"; };
 		670414221F0511EF005BDF55 /* MRRequestManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MRRequestManager.m; sourceTree = "<group>"; };
-		670414241F0538FF005BDF55 /* DetailLoginSimulation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetailLoginSimulation.h; sourceTree = "<group>"; };
-		670414251F0538FF005BDF55 /* DetailLoginSimulation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetailLoginSimulation.m; sourceTree = "<group>"; };
-		670414271F05391F005BDF55 /* BriefLoginSimulation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BriefLoginSimulation.h; sourceTree = "<group>"; };
-		670414281F05391F005BDF55 /* BriefLoginSimulation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BriefLoginSimulation.m; sourceTree = "<group>"; };
 		6704142A1F05DDAB005BDF55 /* Sections.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Sections.plist; sourceTree = "<group>"; };
-		670414321F05E01D005BDF55 /* BusinessQueriesModule.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = BusinessQueriesModule.storyboard; sourceTree = "<group>"; };
+		670414321F05E01D005BDF55 /* CommonRequest.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = CommonRequest.storyboard; sourceTree = "<group>"; };
 		670414341F05E05D005BDF55 /* WeatherQueryController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WeatherQueryController.h; sourceTree = "<group>"; };
 		670414351F05E05D005BDF55 /* WeatherQueryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WeatherQueryController.m; sourceTree = "<group>"; };
 		670414371F05F113005BDF55 /* MRRequestDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MRRequestDelegate.h; sourceTree = "<group>"; };
+		677576621F0DE45600715F6B /* RefreshAccessTokenController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RefreshAccessTokenController.h; sourceTree = "<group>"; };
+		677576631F0DE45600715F6B /* RefreshAccessTokenController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RefreshAccessTokenController.m; sourceTree = "<group>"; };
+		677576651F0DEAB900715F6B /* RequestAccessTokenController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RequestAccessTokenController.h; sourceTree = "<group>"; };
+		677576661F0DEAB900715F6B /* RequestAccessTokenController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RequestAccessTokenController.m; sourceTree = "<group>"; };
 		E0A76381132CEEA4E6FDC8B1 /* Pods-MRRequest.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MRRequest.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MRRequest/Pods-MRRequest.debug.xcconfig"; sourceTree = "<group>"; };
 		FACBC04A2AAC7CB9A6F07D4A /* Pods-MRRequest.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MRRequest.release.xcconfig"; path = "Pods/Target Support Files/Pods-MRRequest/Pods-MRRequest.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -140,32 +140,32 @@
 		670414181F04F0EA005BDF55 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
-				6704142C1F05DFB2005BDF55 /* LoginModule */,
-				670414311F05DFFB005BDF55 /* BusinessQueries */,
+				6704142C1F05DFB2005BDF55 /* OAuth Module */,
+				670414311F05DFFB005BDF55 /* CommonRequest */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
 		};
-		6704142C1F05DFB2005BDF55 /* LoginModule */ = {
+		6704142C1F05DFB2005BDF55 /* OAuth Module */ = {
 			isa = PBXGroup;
 			children = (
-				670414191F04F5CD005BDF55 /* LoginModule.storyboard */,
-				670414241F0538FF005BDF55 /* DetailLoginSimulation.h */,
-				670414251F0538FF005BDF55 /* DetailLoginSimulation.m */,
-				670414271F05391F005BDF55 /* BriefLoginSimulation.h */,
-				670414281F05391F005BDF55 /* BriefLoginSimulation.m */,
+				670414191F04F5CD005BDF55 /* OAuthRequest.storyboard */,
+				677576651F0DEAB900715F6B /* RequestAccessTokenController.h */,
+				677576661F0DEAB900715F6B /* RequestAccessTokenController.m */,
+				677576621F0DE45600715F6B /* RefreshAccessTokenController.h */,
+				677576631F0DE45600715F6B /* RefreshAccessTokenController.m */,
 			);
-			name = LoginModule;
+			name = "OAuth Module";
 			sourceTree = "<group>";
 		};
-		670414311F05DFFB005BDF55 /* BusinessQueries */ = {
+		670414311F05DFFB005BDF55 /* CommonRequest */ = {
 			isa = PBXGroup;
 			children = (
-				670414321F05E01D005BDF55 /* BusinessQueriesModule.storyboard */,
+				670414321F05E01D005BDF55 /* CommonRequest.storyboard */,
 				670414341F05E05D005BDF55 /* WeatherQueryController.h */,
 				670414351F05E05D005BDF55 /* WeatherQueryController.m */,
 			);
-			name = BusinessQueries;
+			name = CommonRequest;
 			sourceTree = "<group>";
 		};
 		6E962C56A0ACF96DAE980F62 /* Frameworks */ = {
@@ -240,8 +240,8 @@
 			files = (
 				6704142B1F05DDAB005BDF55 /* Sections.plist in Resources */,
 				670412C91F02039A005BDF55 /* LaunchScreen.storyboard in Resources */,
-				670414331F05E01D005BDF55 /* BusinessQueriesModule.storyboard in Resources */,
-				6704141A1F04F5CD005BDF55 /* LoginModule.storyboard in Resources */,
+				670414331F05E01D005BDF55 /* CommonRequest.storyboard in Resources */,
+				6704141A1F04F5CD005BDF55 /* OAuthRequest.storyboard in Resources */,
 				670412C61F02039A005BDF55 /* Assets.xcassets in Resources */,
 				670412C41F02039A005BDF55 /* Main.storyboard in Resources */,
 			);
@@ -305,12 +305,12 @@
 				670414231F0511EF005BDF55 /* MRRequestManager.m in Sources */,
 				670412BE1F02039A005BDF55 /* AppDelegate.m in Sources */,
 				670414171F04F00E005BDF55 /* RootViewController.m in Sources */,
-				670414261F0538FF005BDF55 /* DetailLoginSimulation.m in Sources */,
+				677576671F0DEAB900715F6B /* RequestAccessTokenController.m in Sources */,
 				670413D61F04D74B005BDF55 /* MRRequestParameter.m in Sources */,
 				670412BB1F02039A005BDF55 /* main.m in Sources */,
 				670414201F050EF8005BDF55 /* MRRequest.m in Sources */,
-				670414291F05391F005BDF55 /* BriefLoginSimulation.m in Sources */,
 				670414361F05E05D005BDF55 /* WeatherQueryController.m in Sources */,
+				677576641F0DE45600715F6B /* RefreshAccessTokenController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

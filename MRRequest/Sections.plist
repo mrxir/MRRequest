@@ -6,26 +6,38 @@
 	<array>
 		<dict>
 			<key>title</key>
-			<string>OAuth - Login</string>
+			<string>OAuth Request</string>
 			<key>item</key>
 			<array>
 				<dict>
 					<key>identifier</key>
-					<string>DetailLoginSimulation</string>
+					<string>RequestAccessTokenController</string>
 					<key>description</key>
-					<string>OAuth2 详细登录模拟</string>
+					<string>OAuth2.0 获取访问令牌</string>
 				</dict>
 				<dict>
 					<key>identifier</key>
-					<string>BriefLoginSimulation</string>
+					<string>RefreshAccessTokenController</string>
 					<key>description</key>
-					<string>OAuth2 简要登录模拟</string>
+					<string>OAuth2.0 刷新访问令牌</string>
+				</dict>
+				<dict>
+					<key>identifier</key>
+					<string></string>
+					<key>description</key>
+					<string>OAuth2.0 用户名密码登录</string>
+				</dict>
+				<dict>
+					<key>identifier</key>
+					<string></string>
+					<key>description</key>
+					<string>OAuth2.0 手机号短信登录</string>
 				</dict>
 			</array>
 		</dict>
 		<dict>
 			<key>title</key>
-			<string>Normal Request</string>
+			<string>Common Request</string>
 			<key>item</key>
 			<array>
 				<dict>

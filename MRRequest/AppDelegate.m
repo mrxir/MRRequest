@@ -14,64 +14,51 @@
 
 #import <SVProgressHUD.h>
 
+#import "RequestAccessTokenController.h"
+
 @interface AppDelegate ()
 
 @end
 
 @implementation AppDelegate
 
+- (UINavigationController *)rootViewController
+{
+    return (id)self.window.rootViewController;
+}
+
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
-    
+
     [MRRequest setLogLevel:MRRequestLogLevelVerbose];
     
-    /* 开启方式:1 */
     NSError *error = nil;
-    BOOL enabled = [MRRequest enableOAuthRequestWithClientId:@"123456"
-                                                clientSecret:@"000000"
-                                    autodestructTimeInterval:60.0f
-                                                    anyError:&error];
-    if (!enabled) {
-        NSLog(@"OAuth开启失败!");
-        NSLog(@"%@", error);
-    } else {
-        NSLog(@"OAuth开启成功");
-        
-        [MRRequest setOAuthStatePeriodicCheckTimeInterval:5];
-        NSLog(@"OAuth 每 %02.2f 秒检查一次状态", [MRRequest oAuthStatePeriodicCheckTimeInterval]);
-        
-        [MRRequest setOAuthAccessTokenAbnormalCustomPlanBlock:^{
-            NSLog(@"我是自定义access_token失效预案方法");
-        } replaceOrKeepBoth:NO];
-        
-        [MRRequest setOAuthRefreshTokenAbnormalCustomPlanBlock:^{
-            NSLog(@"我是自定义refresh_token失效预案方法");
-        } replaceOrKeepBoth:NO];
-        
-        
-    }
+    [MRRequest enableOAuthRequestWithServer:@"http://10.0.40.119:8080/oauth/token?"
+                                   clientId:@"ff2ff059d245ae8cb378ab54a92e966d"
+                               clientSecret:@"01f32ac28d7b45e08932f11a958f1d9f"
+                   autodestructTimeInterval:60.0f
+                                   anyError:&error];
     
+    [MRRequest setOAuthStatePeriodicCheckTimeInterval:1];
+    [MRRequest setOAuthStatePeriodicCheckEnabled:YES];
     
+    [MRRequest setOAuthAccessTokenAbnormalCustomPlanBlock:^{
+        NSLog(@"我是自定义access_token失效预案方法");
+    } replaceOrKeepBoth:NO];
     
-    /* 开启方式:2 */
-//    [MRRequest setOAuthClientId:@"123456"];
-//    [MRRequest setOAuthClientSecret:@"000000"];
-//    [MRRequest setOAuthInfoAutodestructTimeInterval:60.0f];
-//    [MRRequest setOAuthEnabled:YES];
-//    [MRRequest setOAuthStatePeriodicCheckTimeInterval:5];
-//    [MRRequest setOAuthAccessTokenAbnormalCustomPlanBlock:^{
-//        NSLog(@"access_token失效时执行我");
-//    } replaceOrKeepBoth:NO];
-//    [MRRequest setOAuthRefreshTokenAbnormalCustomPlanBlock:^{
-//        NSLog(@"refresh_token失效时执行我");
-//    } replaceOrKeepBoth:NO];
-    
-    
+    [MRRequest setOAuthRefreshTokenAbnormalCustomPlanBlock:^{
+        NSLog(@"我是自定义refresh_token失效预案方法");
+        
+        UIViewController *vc = [RequestAccessTokenController matchControllerForMyself];
+        
+        [[self rootViewController] pushViewController:vc animated:YES];
+        
+    } replaceOrKeepBoth:NO];
     
     [UIStoryboard setStoryboardNames:@[@"Main",
-                                       @"LoginModule",
-                                       @"BusinessQueriesModule"]];
+                                       @"OAuthRequest",
+                                       @"CommonRequest"]];
     
     [SVProgressHUD setMinimumSize:CGSizeMake(100.0f, 100.0f)];
     
