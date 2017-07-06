@@ -24,18 +24,22 @@
 
 @implementation MRRequestParameter
 
+@synthesize structure = _structure;
+
 #pragma mark - life cycle
 
 - (void)dealloc
 {
     // 释放所有的强引用属性
+    
+    NSLog(@"[OAUTH] %s", __FUNCTION__);
 }
 
 - (instancetype)initWithObject:(id)obj
 {
     if (self = [super init]) {
         
-        _source = obj;
+        _object = obj;
         
         _timestampDateFormatter = [[NSDateFormatter alloc] init];
         _timestampDateFormatter.dateFormat = @"yyyyMMddHHmmssSSS";
@@ -55,9 +59,15 @@
 
 #pragma mark - rewrite getter
 
-- (id)result
+- (id)structure
 {
-    return [self constructResultWithSource:self.source];
+    if (!_structure) {
+        id dynamicParameter = nil;
+        _structure = [self constructResultWithSource:self.object dynamicParameter:&dynamicParameter];
+        _dynamicParameter = dynamicParameter;
+    }
+    
+    return _structure;
 }
 
 - (NSString *)description
@@ -66,6 +76,9 @@
     [description appendFormat:@"<%@: %p>", self.class, self];
     
     NSMutableDictionary *property = [NSMutableDictionary dictionary];
+    property[@"source"] = self.object;
+    property[@"structure"] = self.structure;
+    property[@"dynamicParameter"] = self.dynamicParameter;
     property[@"isOAuthIndependentSwitchState"] = @(self.isOAuthIndependentSwitchState);
     property[@"isOAuthIndependentSwitchHasBeenSetted"] = @(self.isOAuthIndependentSwitchHasBeenSetted);
     property[@"oAuthRequestScope"] = @(self.oAuthRequestScope);
@@ -75,11 +88,9 @@
     property[@"sourcePrefix"] = self.sourcePrefix;
     property[@"relativelyStableParameterString"] = self.relativelyStableParameterString;
     property[@"identifier"] = self.identifier;
-    property[@"source"] = self.source;
-    property[@"result"] = [self.result isKindOfClass:[NSData class]] ? [self.result stringWithUTF8] : self.result;
     
     [description appendFormat:@" "];
-    [description appendFormat:@"%@", property.stringWithUTF8];
+    [description appendFormat:@"%@", property];
     
     return description;
 }
@@ -87,7 +98,7 @@
 
 #pragma mark - private tool method
 
-- (id)constructResultWithSource:(id)source
+- (id)constructResultWithSource:(id)source dynamicParameter:(id *)dynamicParameter
 {
     
     // OAuth 开关状态
@@ -138,8 +149,8 @@
                 NSString *client_secret = oAuthDynamicParameter[@"client_secret"];
                 NSString *grant_type = oAuthDynamicParameter[@"grant_type"];
                 
-                if (![NSString isValidString:client_id]) client_id = [MROAuthRequestManager defaultManager].clientId;
-                if (![NSString isValidString:client_secret]) client_secret = [MROAuthRequestManager defaultManager].clientSecret;
+                if (![NSString isValidString:client_id]) client_id = [MROAuthRequestManager defaultManager].client_id;
+                if (![NSString isValidString:client_secret]) client_secret = [MROAuthRequestManager defaultManager].client_secret;
                 if (![NSString isValidString:grant_type]) grant_type = @"password";
                 
                 oAuthDynamicParameter[@"client_id"]      = client_id;
@@ -152,18 +163,18 @@
                 
                 NSString *client_id = oAuthDynamicParameter[@"client_id"];
                 NSString *client_secret = oAuthDynamicParameter[@"client_secret"];
-                NSString *refresh_token = oAuthDynamicParameter[@"refresh_token"];
                 NSString *grant_type = oAuthDynamicParameter[@"grant_type"];
+                NSString *refresh_token = oAuthDynamicParameter[@"refresh_token"];
                 
-                if (![NSString isValidString:client_id]) client_id = [MROAuthRequestManager defaultManager].clientId;
-                if (![NSString isValidString:client_secret]) client_secret = [MROAuthRequestManager defaultManager].clientSecret;
+                if (![NSString isValidString:client_id]) client_id = [MROAuthRequestManager defaultManager].client_id;
+                if (![NSString isValidString:client_secret]) client_secret = [MROAuthRequestManager defaultManager].client_secret;
                 if (![NSString isValidString:refresh_token]) refresh_token = [MROAuthRequestManager defaultManager].refresh_token;
                 if (![NSString isValidString:grant_type]) grant_type = @"refresh_token";
                 
                 oAuthDynamicParameter[@"client_id"]      = client_id;
                 oAuthDynamicParameter[@"client_secret"]  = client_secret;
-                oAuthDynamicParameter[@"refresh_token"]  = refresh_token;
                 oAuthDynamicParameter[@"grant_type"]     = grant_type;
+                oAuthDynamicParameter[@"refresh_token"]  = refresh_token;
                 
             }
             
@@ -192,6 +203,10 @@
             oAuthDynamicParameter[@"sign"] = sign;
             
             validJSONObjectOrString = oAuthDynamicParameter;
+            
+            if (dynamicParameter != nil) {
+                *dynamicParameter = validJSONObjectOrString;
+            }
             
         }
         
@@ -251,6 +266,7 @@
     }
     
     _relativelyStableParameterString = relativelyStableValidJSONObjectOrStringFormattedstring;
+    
     
     // 处理请求方式
     id returnObject = nil;

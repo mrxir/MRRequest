@@ -63,7 +63,7 @@ typedef NS_ENUM(NSUInteger, MRRequestParameterFormattedStyle) {
 /**
  OAuth 独立开关是否已被设置过
  */
-@property (nonatomic, assign, getter = isOAuthIndependentSwitchHasBeenSetted) BOOL oAuthIndependentSwitchHasBeenSetted;
+@property (nonatomic, assign, readonly,getter = isOAuthIndependentSwitchHasBeenSetted) BOOL oAuthIndependentSwitchHasBeenSetted;
 
 /**
  OAuth 请求范围
@@ -99,7 +99,12 @@ typedef NS_ENUM(NSUInteger, MRRequestParameterFormattedStyle) {
 /**
  initWith 方法初始化时使用的构造源对象
  */
-@property (nonatomic, strong, readonly) id source;
+@property (nonatomic, strong, readonly) id object;
+
+/**
+ 构造后的动态参数
+ */
+@property (nonatomic, strong, readonly) id dynamicParameter;
 
 /**
  根据 requestMethod, formattedStyle, 以及其他附加参数将 source 构造成想要的结果
@@ -108,7 +113,7 @@ typedef NS_ENUM(NSUInteger, MRRequestParameterFormattedStyle) {
                 如果 requestMethod 为 MRRequestParameterRequestMethodPost, 则 result 将是 NSData 类型.
  *
  */
-@property (nonatomic, strong, readonly) id result;
+@property (nonatomic, strong, readonly) id structure;
 
 /**
  相对稳定的参数字符串, 不包括内部生成的随机数, 时间戳等不固定参数以及包含以上参数所生成的参数, 这个参数字符串串用来判定重复请求.
@@ -134,15 +139,9 @@ typedef NS_ENUM(NSUInteger, MRRequestParameterFormattedStyle) {
 
 - (instancetype)initWithObject:(id)obj;
 
-- (void)dealloc;
-
-#pragma mark - rewrite setter
-
-- (void)setOAuthIndependentSwitchState:(BOOL)oAuthIndependentSwitchState;
-
 #pragma mark - rewrite getter
 
-- (id)result;
+- (id)structure;
 
 - (NSString *)description;
 
