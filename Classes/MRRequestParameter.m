@@ -30,9 +30,9 @@
 
 - (void)dealloc
 {
-    // 释放所有的强引用属性
-    
-    NSLog(@"[OAUTH] %s", __FUNCTION__);
+    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
+        NSLog(@"[OAUTH] ▫️ %s", __FUNCTION__);
+    }
 }
 
 - (instancetype)initWithObject:(id)obj
@@ -201,6 +201,8 @@
             NSString *sign = oAuthDynamicParameter[@"sign"];
             if (![NSString isValidString:sign]) sign = notEmptyKeyValueMap.formattedIntoFormStyleString.md5Hash;
             oAuthDynamicParameter[@"sign"] = sign;
+            
+            NSLog(@"oAuthDynamicParameter %@", oAuthDynamicParameter);
             
             validJSONObjectOrString = oAuthDynamicParameter;
             

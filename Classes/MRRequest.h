@@ -15,25 +15,28 @@
 
 FOUNDATION_EXPORT NSErrorDomain const MRRequestErrorDomain;
 
+
 /**
  MRRequest 错误码
+
+ - MRRequestErrorCodeEqualRequestError:                 重复请求
  
- - MRRequestErrorCodeGlobalInProcessingSameRequest:             通用错误码, 正在处理相同请求
- - MRRequestErrorCodeOAuthOrdinaryBusinessTolerableFailed:      OAuth错误码, 可容忍的普通业务失败, 不需要重新登录
- - MRRequestErrorCodeOAuthOrdinaryBusinessIntolerableFailed:    OAuth错误码, 不可容忍的普通业务失败, 需要重新登录
- - MRRequestErrorCodeOAuthRequestAccessTokenFailed:             OAuth错误码, 获取 access token 失败
- - MRRequestErrorCodeOAuthRefreshAccessTokenFailed:             OAuth错误码, 刷新 access token 失败
+ - MRRequestErrorCodeOAuthRequestError:                 OAuth授权获取时发生错误
+ - MRRequestErrorCodeOAuthRenewalError:                 OAuth授权续约时发生错误
+ 
+ - MRRequestErrorCodeOAuthCommonRequestLightlyError:    OAuth普通请求时发生轻微错误
+ - MRRequestErrorCodeOAuthCommonRequestHeavilyError:    OAuth普通请求时发生严重错误
+ 
  */
 typedef NS_ENUM(NSUInteger, MRRequestErrorCode) {
     
+    MRRequestErrorCodeEqualRequestError                 = 7782222,
     
-    MRRequestErrorCodeGlobalInProcessingSameRequest             = 7782001,
+    MRRequestErrorCodeOAuthRequestError                 = 7782400,
+    MRRequestErrorCodeOAuthRenewalError                 = 7782401,
     
-    MRRequestErrorCodeOAuthOrdinaryBusinessTolerableFailed      = 7782002,
-    MRRequestErrorCodeOAuthOrdinaryBusinessIntolerableFailed    = 7782003,
-    MRRequestErrorCodeOAuthRequestAccessTokenFailed             = 7782004,
-    MRRequestErrorCodeOAuthRefreshAccessTokenFailed             = 7782005,
-    MRRequestErrorCodeOAuthCredentialsConfigError               = 7782444,
+    MRRequestErrorCodeOAuthCommonRequestLightlyError    = 7782500,
+    MRRequestErrorCodeOAuthCommonRequestHeavilyError    = 7782501,
     
 };
 

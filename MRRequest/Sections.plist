@@ -23,15 +23,21 @@
 				</dict>
 				<dict>
 					<key>identifier</key>
-					<string></string>
+					<string>AccountLoginController</string>
 					<key>description</key>
 					<string>OAuth2.0 用户名密码登录</string>
 				</dict>
 				<dict>
 					<key>identifier</key>
-					<string></string>
+					<string>MobileLoginViewController</string>
 					<key>description</key>
 					<string>OAuth2.0 手机号短信登录</string>
+				</dict>
+				<dict>
+					<key>identifier</key>
+					<string>QueryVehicleIdentifierController</string>
+					<key>description</key>
+					<string>OAuth2.0 查询车辆识别码</string>
 				</dict>
 			</array>
 		</dict>

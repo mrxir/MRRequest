@@ -77,6 +77,8 @@
 
 - (void)updateMapAndUI
 {
+    [self.oauthInfo removeObjectForKey:@"sign"];
+
     // insert map
     self.oauthInfo[@"client_id"]        = self.oauth_client_id.text;
     self.oauthInfo[@"client_secret"]    = self.oauth_client_secret.text;
@@ -90,7 +92,7 @@
     
     // 签名
     NSString *sign = self.oauthInfo.formattedIntoFormStyleString.md5Hash;
-    
+        
     self.oauthInfo[@"sign"]             = sign;
     self.oauth_sign.text                = sign;
     
@@ -111,7 +113,7 @@
     
     [MRRequest requestWithPath:self.oauth_server.text parameter:parameter success:^(MRRequest *request, id receiveObject) {
         
-        [SVProgressHUD dismiss];
+        [SVProgressHUD dismissWithDelay:1];
         
         self.resultTextView.text = [NSString stringWithFormat:@"%@", [receiveObject stringWithUTF8]];
         
@@ -119,15 +121,7 @@
         
         self.resultTextView.text = error.description;
         
-        if (error.code == MRRequestErrorCodeOAuthRefreshAccessTokenFailed) {
-            
-            [SVProgressHUD showErrorWithStatus:@"refresh_token 已失效"];
-            
-        } else {
-            
-            [SVProgressHUD showErrorWithStatus:error.localizedDescription];
-            
-        }
+        [SVProgressHUD showErrorWithStatus:@"刷新访问令牌失败"];
         
     }];
     

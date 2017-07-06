@@ -9,9 +9,18 @@
 #import <Foundation/Foundation.h>
 
 #import <UIKit/UIKit.h>
-
 #import "MRRequestParameter.h"
 
+/**
+ 日志级别 [▫️ < ⚪️ < 🔘 < ⚠️ < ❗️<< None] (✅, ❌)
+
+ - MRRequestLogLevelVerbose:    ▫️
+ - MRRequestLogLevelDebug:      ⚪️
+ - MRRequestLogLevelInfo:       🔘
+ - MRRequestLogLevelWarning:    ⚠️
+ - MRRequestLogLevelError:      ❗️
+ - MRRequestLogLevelNone:       None
+ */
 typedef NS_ENUM(NSUInteger, MRRequestLogLevel) {
     MRRequestLogLevelVerbose,
     MRRequestLogLevelDebug,
@@ -86,11 +95,6 @@ typedef NS_ENUM(NSUInteger, MROAuthTokenState) {
 @property (nonatomic, assign, getter = isOAuthAutoExecuteTokenAbnormalPresetPlanEnabled) BOOL oAuthAutoExecuteTokenAbnormalPresetPlanEnabled;
 
 /**
- 是否正在执行OAuth不正常预案中
- */
-@property (nonatomic, assign, getter = isProcessingOAuthAbnormalPresetPlan) BOOL processingOAuthAbnormalPresetPlan;
-
-/**
  access_token授权信息不正常自定义方案代码块
  */
 @property (nonatomic, copy) dispatch_block_t oAuthAccessTokenAbnormalCustomPlanBlock;
@@ -131,5 +135,10 @@ typedef NS_ENUM(NSUInteger, MROAuthTokenState) {
 - (void)resumeOAuthStatePeriodicCheckTimer;
 
 - (void)freezeOAuthStatePeriodicCheckTimer;
+
+- (void)executeFrameworkPresetPlanForAccessTokenAbnormal;
+- (void)executeFrameworkPresetPlanForRefreshTokenAbnormal;
+- (void)executeCustomPresetPlanForAccessTokenAbnormal;
+- (void)executeCustomPresetPlanForRefreshTokenAbnormal;
 
 @end

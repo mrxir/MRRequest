@@ -38,26 +38,46 @@
 
 - (void)setOAuthEnabled:(BOOL)oAuthEnabled
 {
-    _oAuthEnabled = oAuthEnabled;
-    
-    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
+    if (_oAuthEnabled != oAuthEnabled) {
         
-        if (_oAuthEnabled == YES) {
-            NSLog(@"[OAUTH] OAuth enabled.");
-        } else {
-            NSLog(@"[OAUTH] OAuth disabled.");
+        _oAuthEnabled = oAuthEnabled;
+        
+        if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelInfo) {
+            
+            if (_oAuthEnabled == YES) {
+                NSLog(@"[OAUTH] 🔘 OAuth enabled.");
+                
+                [[NSNotificationCenter defaultCenter] addObserver:self
+                                                         selector:@selector(didReceiveApplicationDidBecomeActiveNotification:)
+                                                             name:UIApplicationDidBecomeActiveNotification
+                                                           object:nil];
+                
+            } else {
+                NSLog(@"[OAUTH] 🔘 OAuth disabled.");
+                
+                [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
+            }
+            
         }
         
+        [MROAuthRequestManager defaultManager].oAuthStateAfterOrdinaryBusinessRequestCheckEnabled = _oAuthEnabled;
+        [MROAuthRequestManager defaultManager].oAuthAutoExecuteTokenAbnormalPresetPlanEnabled = _oAuthEnabled;
+        
+        
+        
     }
-    
-    [MROAuthRequestManager defaultManager].oAuthStateAfterOrdinaryBusinessRequestCheckEnabled = _oAuthEnabled;
-    [MROAuthRequestManager defaultManager].oAuthAutoExecuteTokenAbnormalPresetPlanEnabled = _oAuthEnabled;
-    
-    
    
 }
 
-
+- (void)didReceiveApplicationDidBecomeActiveNotification:(NSNotification *)notification
+{
+    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
+        NSLog(@"[OAUTH] ▫️ %s", __FUNCTION__);
+    }
+    
+    [[MROAuthRequestManager defaultManager] analyseOAuthTokenStateAndGenerateReport:nil];
+    
+}
 
 @end
 
@@ -70,6 +90,8 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
 @interface MROAuthRequestManager ()
 
 @property (nonatomic, strong) NSTimer *oAuthStatePeriodicCheckTimer;
+
+@property (nonatomic, assign, getter = isProcessingOAuthAbnormalPresetPlan) BOOL processingOAuthAbnormalPresetPlan;
 
 @end
 
@@ -122,7 +144,7 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
     _oAuthStatePeriodicCheckTimeInterval = oAuthStatePeriodicCheckTimeInterval;
     
     if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelDebug) {
-        NSLog(@"[OAUTH] oauth state periodic check time interval is %.2f", oAuthStatePeriodicCheckTimeInterval);
+        NSLog(@"[OAUTH] ⚪️ OAuth state periodic check time interval is %.2f", oAuthStatePeriodicCheckTimeInterval);
     }
     
     [self.oAuthStatePeriodicCheckTimer setFireDate:[NSDate distantFuture]];
@@ -355,7 +377,7 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
         
         NSString *refreshMark = isRefreshInvalid == YES ? @"🚫" : @"✅";
         
-        NSLog(@"[OAUTH] AK %010.2fs / %010.2fs %@ RK %010.2fs / %010.2fs %@",
+        NSLog(@"[OAUTH] ⚪️ AK %010.2fs / %010.2fs %@ RK %010.2fs / %010.2fs %@",
               access_token_used_timeInterval, access_token_durability_timeInterval, accessMark,
               refresh_token_used_timeInterval, refresh_token_durability_timeInterval, refreshMark);
         
@@ -367,6 +389,10 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
     
     if (isAccessInvalid == YES && isRefreshInvalid == YES) {
         tokenState = MROAuthTokenStateBothInvalid;
+        
+        if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelWarning) {
+            NSLog(@"[OAUTH] ⚠️ Access_token and refresh_token are both invalid.");
+        }
     }
     
     if (isAccessInvalid == NO && isRefreshInvalid == NO) {
@@ -379,6 +405,10 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
     
     if (isAccessInvalid == YES && isRefreshInvalid == NO) {
         tokenState = MROAuthTokenStateOnlyRefreshTokenAvailable;
+        
+        if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelWarning) {
+            NSLog(@"[OAUTH] ⚠️ Access_token is invalid.");
+        }
     }
     
     
@@ -386,41 +416,32 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
     
     if (self.isOAuthAutoExecuteTokenAbnormalPresetPlanEnabled == YES) {
         
-        // 替换
+        // 仅执行自定义
         if (self.isOAuthAccessTokenAbnormalCustomPlanBlockReplaceOrKeepBoth == YES) {
             
-            if (tokenState == MROAuthTokenStateOnlyAccessTokenAvailable || tokenState == MROAuthTokenStateBothInvalid) {
+            // 访问令牌失效
+            if (tokenState == MROAuthTokenStateOnlyRefreshTokenAvailable) {
+                [self executeCustomPresetPlanForAccessTokenAbnormal];
+            }
+            
+            // 两者失效
+            if (tokenState == MROAuthTokenStateBothInvalid) {
                 [self executeCustomPresetPlanForRefreshTokenAbnormal];
             }
             
-            if (tokenState == MROAuthTokenStateOnlyRefreshTokenAvailable) {
-                if (self.isProcessingOAuthAbnormalPresetPlan == NO) {
-                    [self executeCustomPresetPlanForAccessTokenAbnormal];
-                } else {
-                    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelDebug) {
-                        NSLog(@"[OAUTH] The oauth manager is processing framework oauth access token abnormal preset plan now.");
-                    }
-                }
-            }
-            
-            // 保留两者
+        // 执行框架和自定义
         } else {
             
-            if (tokenState == MROAuthTokenStateOnlyAccessTokenAvailable || tokenState == MROAuthTokenStateBothInvalid) {
-                [self executeFrameworkPresetPlanForRefreshTokenAbnormal];
-                [self executeCustomPresetPlanForRefreshTokenAbnormal];
-                
+            // 访问令牌失效
+            if (tokenState == MROAuthTokenStateOnlyRefreshTokenAvailable) {
+                [self executeFrameworkPresetPlanForAccessTokenAbnormal];
+                [self executeCustomPresetPlanForAccessTokenAbnormal];
             }
             
-            if (tokenState == MROAuthTokenStateOnlyRefreshTokenAvailable) {
-                if (self.isProcessingOAuthAbnormalPresetPlan == NO) {
-                    [self executeFrameworkPresetPlanForAccessTokenAbnormal];
-                    [self executeCustomPresetPlanForAccessTokenAbnormal];
-                } else {
-                    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelDebug) {
-                        NSLog(@"[OAUTH] The oauth manager is processing framework oauth access token abnormal preset plan now.");
-                    }
-                }
+            // 两者失效
+            if (tokenState == MROAuthTokenStateBothInvalid) {
+                [self executeFrameworkPresetPlanForRefreshTokenAbnormal];
+                [self executeCustomPresetPlanForRefreshTokenAbnormal];
             }
             
         }
@@ -434,8 +455,8 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
 
 + (void)cleanUserDefaults
 {
-//    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelDebug) {
-//        NSLog(@"[OAUTH] Userdefaults is cleaned.");
+//    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelInfo) {
+//        NSLog(@"[OAUTH] 🔘 Userdefaults is cleaned.");
 //    }
 //    
 //    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"client_id"];
@@ -452,7 +473,7 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
 {
     if (![value isKindOfClass:aClass]) {
         if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelWarning) {
-            NSLog(@"[NSUserDefaults] The object <%@: %p> %@ is not a kind of expected class %@", aClass, value, value, aClass);
+            NSLog(@"[NSUserDefaults] ⚠️ The object <%@: %p> %@ is not a kind of expected class %@", aClass, value, value, aClass);
         }
     }
     
@@ -466,7 +487,7 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
     
     if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelDebug) {
         
-        NSLog(@"[OAUTH] NSUserDefaults has changed \"%@\": %@", key, value);
+        NSLog(@"[OAUTH] ▫️ NSUserDefaults has changed \"%@\": %@", key, value);
         
     }
     
@@ -493,8 +514,8 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
 
 - (void)resumeOAuthStatePeriodicCheckTimer
 {
-    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelDebug) {
-        NSLog(@"[OAUTH] oauth state periodic check timer is resume.");
+    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelInfo) {
+        NSLog(@"[OAUTH] 🔘 OAuth state periodic check timer is resume.");
     }
     
     self.oAuthStatePeriodicCheckTimer.fireDate = [NSDate distantPast];
@@ -503,20 +524,14 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
 - (void)freezeOAuthStatePeriodicCheckTimer
 {
     if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelDebug) {
-        NSLog(@"[OAUTH] oauth state periodic check timer is freeze.");
+        NSLog(@"[OAUTH] 🔘 OAuth state periodic check timer is freeze.");
     }
     
     self.oAuthStatePeriodicCheckTimer.fireDate = [NSDate distantFuture];
 }
 
-#pragma mark - framework preset method
-
-- (void)executeFrameworkPresetPlanForAccessTokenAbnormal
+- (void)frameworkRefreshAccessToken
 {
-    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
-        NSLog(@"[OAUTH] 执行框架预设_刷新授权信息");
-    }
-    
     MRRequestParameter *parameter = [[MRRequestParameter alloc] initWithObject:nil];
     parameter.oAuthIndependentSwitchState = YES;
     parameter.formattedStyle = MRRequestParameterFormattedStyleForm;
@@ -526,21 +541,20 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
     NSString *path = [MROAuthRequestManager defaultManager].server;
     
     self.processingOAuthAbnormalPresetPlan = YES;
-    
-    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelInfo) {
-        NSLog(@"[OAUTH] framework is refresh access token 🌀");
-    }
-    
     [MRRequest requestWithPath:path parameter:parameter success:^(MRRequest *request, id receiveObject) {
         
+        self.processingOAuthAbnormalPresetPlan = NO;
+        
         if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelInfo) {
-            NSLog(@"[OAUTH] framework refresh access token succeeded ✅");
+            NSLog(@"[OAUTH] 🔘 Framework refresh access token succeeded ✅");
         }
         
     } failure:^(MRRequest *request, id requestObject, NSData *data, NSError *error) {
         
+        self.processingOAuthAbnormalPresetPlan = NO;
+        
         if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelInfo) {
-            NSLog(@"[OAUTH] framework refresh access token failed ❌");
+            NSLog(@"[OAUTH] 🔘 Framework refresh access token failed ❌");
         }
         
         [self executeFrameworkPresetPlanForRefreshTokenAbnormal];
@@ -550,28 +564,39 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
         }
         
     }];
+
+}
+
+#pragma mark - framework preset method
+
+- (void)executeFrameworkPresetPlanForAccessTokenAbnormal
+{
+    if (self.isProcessingOAuthAbnormalPresetPlan == YES) return;
     
+    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelInfo) {
+        NSLog(@"[OAUTH] 🔘 Execute framework access_token invalid plan");
+    }
+    
+    [self frameworkRefreshAccessToken];
     
 }
 
 - (void)executeFrameworkPresetPlanForRefreshTokenAbnormal
 {
-    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
-        NSLog(@"[OAUTH] 执行框架预设_销毁授权信息");
-        
-        [MROAuthRequestManager cleanUserDefaults];
-        
+    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelDebug) {
+        NSLog(@"[OAUTH] 🔘 Execute framework refresh_token invalid plan");
     }
+    
+    [MROAuthRequestManager cleanUserDefaults];
     
     [self freezeOAuthStatePeriodicCheckTimer];
     
-    self.processingOAuthAbnormalPresetPlan = YES;
 }
 
 - (void)executeCustomPresetPlanForAccessTokenAbnormal
 {
     if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
-        NSLog(@"[OAUTH] 执行自定义access_token失效预案");
+        NSLog(@"[OAUTH] 🔘 Execute custom access_token invalid plan");
     }
     
     if (self.oAuthAccessTokenAbnormalCustomPlanBlock != nil) {
@@ -582,7 +607,7 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
 - (void)executeCustomPresetPlanForRefreshTokenAbnormal
 {
     if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
-        NSLog(@"[OAUTH] 执行自定义refresh_token失效预案");
+        NSLog(@"[OAUTH] 🔘 Execute custom refresh_token invalid plan");
     }
     
     if (self.oAuthRefreshTokenAbnormalCustomPlanBlock != nil) {

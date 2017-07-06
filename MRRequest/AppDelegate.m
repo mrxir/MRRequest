@@ -37,7 +37,7 @@
     [MRRequest enableOAuthRequestWithServer:@"http://10.0.40.119:8080/oauth/token?"
                                    clientId:@"ff2ff059d245ae8cb378ab54a92e966d"
                                clientSecret:@"01f32ac28d7b45e08932f11a958f1d9f"
-                   autodestructTimeInterval:60.0f
+                   autodestructTimeInterval:41.0f
                                    anyError:&error];
     
     [MRRequest setOAuthStatePeriodicCheckTimeInterval:1];
@@ -50,9 +50,12 @@
     [MRRequest setOAuthRefreshTokenAbnormalCustomPlanBlock:^{
         NSLog(@"我是自定义refresh_token失效预案方法");
         
-        UIViewController *vc = [RequestAccessTokenController matchControllerForMyself];
+        UIViewController *top = [[self rootViewController] topViewController];
         
-        [[self rootViewController] pushViewController:vc animated:YES];
+        if (![top isKindOfClass:[RequestAccessTokenController class]]) {
+            UIViewController *vc = [RequestAccessTokenController matchControllerForMyself];
+            [[self rootViewController] pushViewController:vc animated:YES];
+        }
         
     } replaceOrKeepBoth:NO];
     

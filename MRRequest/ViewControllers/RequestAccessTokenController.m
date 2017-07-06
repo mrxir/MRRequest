@@ -58,11 +58,11 @@
     NSDateFormatter *timestampDateFormatter = [[NSDateFormatter alloc] init];
     timestampDateFormatter.dateFormat = @"yyyyMMddHHmmssSSS";
     
-    self.oauth_server.text = @"http://10.0.40.119:8080/oauth/token?";
-    self.oauth_autodestruct.text = @"40";
+    self.oauth_server.text = [MROAuthRequestManager defaultManager].server;
+    self.oauth_autodestruct.text = [@([MROAuthRequestManager defaultManager].oAuthInfoAutodestructTimeInterval) stringValue];
     
-    self.oauth_client_id.text = @"ff2ff059d245ae8cb378ab54a92e966d";
-    self.oauth_client_secret.text = @"01f32ac28d7b45e08932f11a958f1d9f";
+    self.oauth_client_id.text = [MROAuthRequestManager defaultManager].client_id;
+    self.oauth_client_secret.text = [MROAuthRequestManager defaultManager].client_secret;
     self.oauth_grant_type.text = @"password";
     
     self.oauth_username.text = @"abc123";
@@ -77,6 +77,9 @@
 
 - (void)updateMapAndUI
 {
+    
+    [self.oauthInfo removeObjectForKey:@"sign"];
+    
     // insert map
     self.oauthInfo[@"client_id"]        = self.oauth_client_id.text;
     self.oauthInfo[@"client_secret"]    = self.oauth_client_secret.text;
@@ -94,6 +97,7 @@
     self.oauthInfo[@"sign"]             = sign;
     self.oauth_sign.text                = sign;
     
+    
 }
 
 - (void)didClickRequestButton:(UIButton *)button
@@ -107,11 +111,11 @@
     parameter.requestMethod = MRRequestParameterRequestMethodPost;
     parameter.formattedStyle = MRRequestParameterFormattedStyleForm;
     
-    [SVProgressHUD showWithStatus:@"正在登录..."];
+    [SVProgressHUD showWithStatus:@"正在获取..."];
     
     [MRRequest requestWithPath:self.oauth_server.text parameter:parameter success:^(MRRequest *request, id receiveObject) {
         
-        [SVProgressHUD dismiss];
+        [SVProgressHUD dismissWithDelay:1];
         
         self.resultTextView.text = [NSString stringWithFormat:@"%@", [receiveObject stringWithUTF8]];
         
@@ -119,15 +123,7 @@
         
         self.resultTextView.text = error.description;
         
-        if (error.code == MRRequestErrorCodeOAuthRequestAccessTokenFailed) {
-            
-            [SVProgressHUD showErrorWithStatus:@"用户名或密码错误"];
-            
-        } else {
-            
-            [SVProgressHUD showErrorWithStatus:error.localizedDescription];
-            
-        }
+        [SVProgressHUD showErrorWithStatus:@"获取访问令牌失败"];
         
     }];
     
