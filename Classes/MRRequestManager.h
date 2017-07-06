@@ -44,15 +44,21 @@ typedef NS_ENUM(NSUInteger, MROAuthTokenState) {
 
 @interface MROAuthRequestManager : MRRequestManager
 
+
+/**
+ oauth验证服务器地址
+ */
+@property (nonatomic, copy) NSString *server;
+
 /**
  客户端ID
  */
-@property (nonatomic, copy) NSString *clientId;
+@property (nonatomic, copy) NSString *client_id;
 
 /**
  客户端secret
  */
-@property (nonatomic, copy) NSString *clientSecret;
+@property (nonatomic, copy) NSString *client_secret;
 
 /**
  oauth授权信息自动销毁时间间隔
@@ -60,14 +66,14 @@ typedef NS_ENUM(NSUInteger, MROAuthTokenState) {
 @property (nonatomic, assign) NSTimeInterval oAuthInfoAutodestructTimeInterval;
 
 /**
- oauth授权信息周期性检查开关
- */
-@property (nonatomic, assign, getter = isOAuthStatePeriodicCheckEnabled) BOOL oAuthStatePeriodicCheckEnabled;
-
-/**
  oauth授权信息周期性检查时间间隔
  */
 @property (nonatomic, assign) NSTimeInterval oAuthStatePeriodicCheckTimeInterval;
+
+/**
+ oauth授权信息周期性检查开关
+ */
+@property (nonatomic, assign, getter = isOAuthStatePeriodicCheckEnabled) BOOL oAuthStatePeriodicCheckEnabled;
 
 /**
  当一个oauth请求完成后是否检查oauth授权信息的开关
@@ -105,9 +111,16 @@ typedef NS_ENUM(NSUInteger, MROAuthTokenState) {
 @property (nonatomic, assign, getter = isOAuthRefreshTokenAbnormalCustomPlanBlockReplaceOrKeepBoth) BOOL oAuthRefreshTokenAbnormalCustomPlanBlockReplaceOrKeepBoth;
 
 @property (nonatomic, strong) NSDictionary *oAuthResultInfo;
+
 @property (nonatomic, copy) NSString *access_token;
+
 @property (nonatomic, copy) NSString *refresh_token;
+
 @property (nonatomic, strong) NSNumber *expires_in;
+
+@property (nonatomic, strong) NSDate *access_token_storage_date;
+
+@property (nonatomic, strong) NSDate *refresh_token_storage_date;
 
 + (instancetype)defaultManager;
 
