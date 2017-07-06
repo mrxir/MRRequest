@@ -113,13 +113,18 @@ typedef void(^Failure)(MRRequest *request, id requestObject, NSData *data, NSErr
 /**
  开启oauth请求
 
+ @param server 服务器
  @param clientId 客户端ID
  @param clientSecret 客户端密钥
  @param autodestructTimeInterval 凭证自动销毁时间间隔
  @param error 开启失败的错误信息
  @return 是否开启成功
  */
-+ (BOOL)enableOAuthRequestWithClientId:(NSString *)clientId clientSecret:(NSString *)clientSecret autodestructTimeInterval:(NSTimeInterval)autodestructTimeInterval anyError:(NSError **)error;
++ (BOOL)enableOAuthRequestWithServer:(NSString *)server
+                            clientId:(NSString *)clientId
+                        clientSecret:(NSString *)clientSecret
+            autodestructTimeInterval:(NSTimeInterval)autodestructTimeInterval
+                            anyError:(NSError *__autoreleasing *)error;
 
 #pragma mark - OAuth - 分析并返回oauth授权信息状态, 可以获得一份分析报告
 
@@ -140,19 +145,15 @@ typedef void(^Failure)(MRRequest *request, id requestObject, NSData *data, NSErr
 
 @interface MRRequest (OAuthSetting)
 
-#pragma mark - OAuth - oauth request 总开关
+#pragma mark - OAuth 设置oauth服务器
 
 /**
- OAuth request 总开关
+ OAuth 设置oauth服务器
 
- @param enabled 是否开启, 默认关闭
- 
- @Instructions: 当开启或关闭时, 会连锁的同步设置一系列开关
- 
- *
+ @param server 服务器地址
  */
-+ (void)setOAuthEnabled:(BOOL)enabled;
-+ (BOOL)isOAuthEnabled;
++ (void)setOAuthServer:(NSString *)server;
++ (NSString *)oAuthServer;
 
 
 

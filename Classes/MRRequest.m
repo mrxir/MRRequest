@@ -65,7 +65,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     if (parameter.requestMethod == MRRequestParameterRequestMethodGet) {
         
         // 防止多次调用 parameter get result 方法, 因为该方法已被重写切相对较为复杂.
-        NSString *theParameterOfGetRequest = parameter.result;
+        NSString *theParameterOfGetRequest = parameter.structure;
         
         if ([theParameterOfGetRequest isKindOfClass:[NSString class]]) {
             
@@ -91,7 +91,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
                 
                 NSLog(@"[ERROR] URL 无效, 已对 path 进行编码, 编码后得到的 URL 依然无效, 若要解决此问题, 请检查 path 及 parameter");
                 NSLog(@"[ERROR] path \"%@\"", originPath);
-                NSLog(@"[ERROR] parameter %@", parameter.source);
+                NSLog(@"[ERROR] parameter %@", parameter.object);
                 NSLog(@"[ERROR] URL \"%@\"", path);
                 NSLog(@"[ERROR] EncodedURL \"%@\"", url.absoluteString);
                 
@@ -103,7 +103,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
                 
                 NSLog(@"[CAUTION] URL 无效, 已对 path 进行编码, 编码后的 URL 可用, 若要解决此问题, 请检查 path 及 parameter.");
                 NSLog(@"[CAUTION] path \"%@\"", originPath);
-                NSLog(@"[CAUTION] parameter %@", parameter.source);
+                NSLog(@"[CAUTION] parameter %@", parameter.object);
                 NSLog(@"[CAUTION] URL \"%@\"", path);
                 NSLog(@"[CAUTION] EncodedURL \"%@\"", url.absoluteString);
 
@@ -174,7 +174,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
         if (parameter.requestMethod == MRRequestParameterRequestMethodPost) {
             self.HTTPMethod = @"POST";
             
-            NSData *data = parameter.result;
+            NSData *data = parameter.structure;
             
             if ([data isKindOfClass:[NSData class]]) {
                 self.HTTPBody = data;
@@ -277,7 +277,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     
     // block failure
     if (self.failure != NULL) {
-        self.failure(self, self.parameter.result, self.receiveData, self.anyError);
+        self.failure(self, self.parameter.dynamicParameter, self.receiveData, self.anyError);
     }
     
     // delegate failure
@@ -412,7 +412,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     if (self.parameter.isOAuthIndependentSwitchHasBeenSetted == YES) {
         oAuthEnabled = self.parameter.isOAuthIndependentSwitchState;
     } else {
-        oAuthEnabled = [MRRequest isOAuthEnabled];
+        oAuthEnabled = [MRRequestManager defaultManager].isOAuthEnabled;
     }
     
     if (oAuthEnabled == YES) {
@@ -524,47 +524,45 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     NSDictionary *receiveDictionary = [NSDictionary dictionaryWithDictionary:self.receiveObject];
     
     NSString *oAuthErrorCode = nil;
-    NSString *oAuthErrorReason = nil;
+    NSString *oAuthErrorDesc = nil;
     
     NSDictionary *exception = receiveDictionary[@"exception"];
     
     if (exception != nil && [exception isKindOfClass:[NSDictionary class]]) {
         
         oAuthErrorCode = exception[@"error"];
-        oAuthErrorReason = exception[@"error_description"];
+        oAuthErrorDesc = exception[@"error_description"];
         
     } else {
         
         oAuthErrorCode = receiveDictionary[@"error"];
-        oAuthErrorReason = receiveDictionary[@"error_description"];
+        oAuthErrorDesc = receiveDictionary[@"error_description"];
         
     }
     
-    if (exception != nil || oAuthErrorCode != nil || oAuthErrorReason != nil) {
+    if (exception != nil || oAuthErrorCode != nil || oAuthErrorDesc != nil) {
         
         oAuthErrorCode = [NSString stringWithFormat:@"%@", oAuthErrorCode];
-        oAuthErrorReason = [NSString stringWithFormat:@"%@", oAuthErrorReason];
+        oAuthErrorDesc = [NSString stringWithFormat:@"%@", oAuthErrorDesc];
         
-        if ([NSString isValidString:oAuthErrorCode] == NO) oAuthErrorCode = @"unknown_oauth_error";
-        if ([NSString isValidString:oAuthErrorReason] == NO) oAuthErrorReason = @"unknown_oauth_error_reason";
+        if ([NSString isValidString:oAuthErrorCode] == NO) oAuthErrorCode = @"unknown_oauth_error_code";
+        if ([NSString isValidString:oAuthErrorDesc] == NO) oAuthErrorDesc = @"unknown_oauth_error_desc";
         
-        NSString *failureReason = [NSString stringWithFormat:@"%@, %@", oAuthErrorCode, oAuthErrorReason];
+        NSString *oAuthErrorCodeDesc = [NSString stringWithFormat:@"%@, %@", oAuthErrorCode, oAuthErrorDesc];
         
         MRRequestErrorCode requestErrorCode = 0;
         
-        NSString *oAuthRequestErrorDescription = nil;
+        NSString *requestErrorDesc = nil;
         
         if (self.parameter.oAuthRequestScope == MRRequestParameterOAuthRequestScopeRequestAccessToken) {
             
             requestErrorCode = MRRequestErrorCodeOAuthRequestAccessTokenFailed;
-            
-            oAuthRequestErrorDescription = [NSString stringWithFormat:@"获取 access token 失败, %@", failureReason];
+            requestErrorDesc = [NSString stringWithFormat:@"获取 access token 失败, %@", oAuthErrorCodeDesc];
             
         } else if (self.parameter.oAuthRequestScope == MRRequestParameterOAuthRequestScopeRefreshAccessToken) {
             
             requestErrorCode = MRRequestErrorCodeOAuthRefreshAccessTokenFailed;
-            
-            oAuthRequestErrorDescription = [NSString stringWithFormat:@"刷新 access token 失败, %@", failureReason];
+            requestErrorDesc = [NSString stringWithFormat:@"刷新 access token 失败, %@", oAuthErrorCodeDesc];
             
         } else if (self.parameter.oAuthRequestScope == MRRequestParameterOAuthRequestScopeOrdinaryBusiness) {
             
@@ -580,8 +578,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
             {
                 
                 requestErrorCode = MRRequestErrorCodeOAuthOrdinaryBusinessTolerableFailed;
-                
-                oAuthRequestErrorDescription = [NSString stringWithFormat:@"可容忍的业务请求失败, %@", failureReason];
+                requestErrorDesc = [NSString stringWithFormat:@"可容忍的业务请求失败, %@", oAuthErrorCodeDesc];
                 
             }
             
@@ -594,8 +591,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
             {
                 
                 requestErrorCode = MRRequestErrorCodeOAuthOrdinaryBusinessIntolerableFailed;
-                
-                oAuthRequestErrorDescription = [NSString stringWithFormat:@"不可容忍的业务请求失败, %@", failureReason];
+                requestErrorDesc = [NSString stringWithFormat:@"不可容忍的业务请求失败, %@", oAuthErrorCodeDesc];
                 
             }
             
@@ -603,8 +599,8 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
         
         *error = [NSError errorWithDomain:MRRequestErrorDomain
                                      code:requestErrorCode
-                                 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(oAuthRequestErrorDescription, nil),
-                                            NSLocalizedFailureReasonErrorKey: NSLocalizedString(failureReason, nil)}];
+                                 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(requestErrorDesc, nil),
+                                            NSLocalizedFailureReasonErrorKey: NSLocalizedString(oAuthErrorCodeDesc, nil)}];
         
         if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelError) {
             NSLog(@"[OAUTH] %@", *error);
@@ -648,41 +644,40 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
 
 @implementation MRRequest (OAuthPublicMethod)
 
-+ (BOOL)enableOAuthRequestWithClientId:(NSString *)clientId clientSecret:(NSString *)clientSecret autodestructTimeInterval:(NSTimeInterval)autodestructTimeInterval anyError:(NSError *__autoreleasing *)error
++ (BOOL)enableOAuthRequestWithServer:(NSString *)server
+                            clientId:(NSString *)clientId
+                        clientSecret:(NSString *)clientSecret
+            autodestructTimeInterval:(NSTimeInterval)autodestructTimeInterval
+                            anyError:(NSError *__autoreleasing *)error
 {
-    BOOL enabled = NO;
-    
-    if ([NSString isValidString:clientId] && [NSString isValidString:clientSecret]) {
-        
-        if (clientId.length >= 6 && clientSecret.length >= 6) {
-            
-            if (autodestructTimeInterval >= 10) {
-                
-                enabled = YES;
-                
-                [MROAuthRequestManager defaultManager].clientId = clientId;
-                [MROAuthRequestManager defaultManager].clientSecret = clientSecret;
-                [MROAuthRequestManager defaultManager].oAuthInfoAutodestructTimeInterval = autodestructTimeInterval;
-                
-                [MRRequestManager defaultManager].oAuthEnabled = YES;
-                
-                
-            }
-            
+    BOOL shouldEnabled = NO;
+
+    if ([NSString isValidString:server] && [NSString isValidString:clientId] && [NSString isValidString:clientSecret]) {
+        if (clientId.length >= 6 && clientSecret.length >= 6 && autodestructTimeInterval >= 10) {
+            shouldEnabled = YES;
         }
-        
     }
     
-    if (enabled == NO) {
+    if (shouldEnabled == YES) {
+        
+        [MROAuthRequestManager defaultManager].server = server;
+        [MROAuthRequestManager defaultManager].client_id = clientId;
+        [MROAuthRequestManager defaultManager].client_secret = clientSecret;
+        [MROAuthRequestManager defaultManager].oAuthInfoAutodestructTimeInterval = autodestructTimeInterval;
+        
+        [MRRequestManager defaultManager].oAuthEnabled = YES;
+                
+    } else {
         
         if (error != nil) {
             
             *error = [NSError errorWithDomain:MRRequestErrorDomain
                                          code:MRRequestErrorCodeOAuthCredentialsConfigError
-                                     userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"客户端凭证有误, 请检查 😨", nil),
-                                                @"credentials": @{@"clientId": [NSString stringWithFormat:@"%@", clientId],
-                                                                  @"clientSecret": [NSString stringWithFormat:@"%@", clientSecret],
-                                                                  @"autodestructTimeInterval": @(autodestructTimeInterval)}}];
+                                     userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"OAuth信息设置有误, 请检查 😨", nil),
+                                                @"oauth": @{@"server": [NSString stringWithFormat:@"%@", server],
+                                                            @"clientId": [NSString stringWithFormat:@"%@", clientId],
+                                                            @"clientSecret": [NSString stringWithFormat:@"%@", clientSecret],
+                                                            @"autodestructTimeInterval": @(autodestructTimeInterval)}}];
             
             if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelError) {
                 NSLog(@"[OAUTH] %@", *error);
@@ -690,10 +685,11 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
             
             
         }
+
         
     }
     
-    return enabled;
+    return shouldEnabled;
 }
 
 #pragma mark - OAuth - 分析并返回oauth授权信息状态, 可以获得一份分析报告
@@ -711,10 +707,16 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
 
 @implementation MRRequest (OAuthSetting)
 
+
+
 #pragma mark - OAuth - oauth request 总开关
 
 + (void)setOAuthEnabled:(BOOL)enabled
 {
+    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelInfo) {
+        NSLog(@"[OAUTH] oauth enabled is %d", enabled);
+    }
+    
     [MRRequestManager defaultManager].oAuthEnabled = enabled;
 }
 
@@ -725,27 +727,49 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
 
 
 
-#pragma mark - OAuth - oauth授权信息自动销毁时间间隔
+#pragma mark - OAuth 设置oauth服务器
+
++ (void)setOAuthServer:(NSString *)server
+{
+    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelInfo) {
+        NSLog(@"[OAUTH] oauth server is %@", server);
+    }
+    
+    [MROAuthRequestManager defaultManager].server = server;
+}
+
++ (NSString *)oAuthServer
+{
+    return [MROAuthRequestManager defaultManager].server;
+}
+
+
+
+#pragma mark - OAuth - 设置oauth客户端凭证信息
 
 + (void)setOAuthClientId:(NSString *)clientId
 {
-    [MROAuthRequestManager defaultManager].clientId = clientId;
+    [MROAuthRequestManager defaultManager].client_id = clientId;
 }
 
 + (NSString *)oAuthClientId
 {
-    return [MROAuthRequestManager defaultManager].clientId;
+    return [MROAuthRequestManager defaultManager].client_id;
 }
 
 + (void)setOAuthClientSecret:(NSString *)secret
 {
-    [MROAuthRequestManager defaultManager].clientSecret = secret;
+    [MROAuthRequestManager defaultManager].client_secret = secret;
 }
 
 + (NSString *)oAuthClientSecret
 {
-    return [MROAuthRequestManager defaultManager].clientSecret;
+    return [MROAuthRequestManager defaultManager].client_secret;
 }
+
+
+
+#pragma mark - OAuth - oauth授权信息自动销毁时间间隔
 
 + (void)setOAuthInfoAutodestructTimeInterval:(NSTimeInterval)timeInterval
 {
