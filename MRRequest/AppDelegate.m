@@ -14,7 +14,9 @@
 
 #import <SVProgressHUD.h>
 
-#import "RequestAccessTokenController.h"
+#import "AccountLoginController.h"
+
+#import <UIView+Toast.h>
 
 @interface AppDelegate ()
 
@@ -30,14 +32,25 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    
+    
+    CSToastStyle *style = [[CSToastStyle alloc] initWithDefaultStyle];
+    
+    style.displayShadow = YES;
+    
+    [CSToastManager setSharedStyle:style];
+    
+    [CSToastManager setQueueEnabled:NO];
+    [CSToastManager setDefaultPosition:CSToastPositionBottom];
+
 
     [MRRequest setLogLevel:MRRequestLogLevelVerbose];
     
     NSError *error = nil;
-    [MRRequest enableOAuthRequestWithServer:@"http://10.0.40.119:8080/oauth/token?"
+    [MRRequest enableOAuthRequestWithServer:@"http://10.0.40.101:8080/oauth/token?"
                                    clientId:@"ff2ff059d245ae8cb378ab54a92e966d"
                                clientSecret:@"01f32ac28d7b45e08932f11a958f1d9f"
-                   autodestructTimeInterval:41.0f
+                   autodestructTimeInterval:300.0f
                                    anyError:&error];
     
     [MRRequest setOAuthStatePeriodicCheckTimeInterval:1];
@@ -48,16 +61,39 @@
     } replaceOrKeepBoth:NO];
     
     [MRRequest setOAuthRefreshTokenAbnormalCustomPlanBlock:^{
-        NSLog(@"我是自定义refresh_token失效预案方法");
         
         UIViewController *top = [[self rootViewController] topViewController];
         
-        if (![top isKindOfClass:[RequestAccessTokenController class]]) {
-            UIViewController *vc = [RequestAccessTokenController matchControllerForMyself];
+        if (![top isKindOfClass:[AccountLoginController class]]) {
+            UIViewController *vc = [AccountLoginController matchControllerForMyself];
             [[self rootViewController] pushViewController:vc animated:YES];
         }
         
     } replaceOrKeepBoth:NO];
+    
+    [MRRequest setHandleBlock:^{
+        [[UIApplication sharedApplication].keyWindow makeToast:@"正在处理上个请求, 请稍候... 😊" duration:3 position:CSToastPositionTop];
+    } forErrorCode:MRRequestErrorCodeEqualRequestError];
+    
+    [MRRequest setHandleBlock:^{
+        [SVProgressHUD showInfoWithStatus:@"登录失败, 用户名或密码错误."];
+    } forErrorCode:MRRequestErrorCodeOAuthRequestError];
+    
+    [MRRequest setHandleBlock:^{
+        [SVProgressHUD showInfoWithStatus:@"您的登录状态已失效, 请重新登录."];
+    } forErrorCode:MRRequestErrorCodeOAuthRenewalError];
+    
+    [MRRequest setHandleBlock:^{
+        [SVProgressHUD showInfoWithStatus:@"请求失败或服务未及时响应"];
+    } forErrorCode:MRRequestErrorCodeOAuthCommonRequestLightlyError];
+    
+    [MRRequest setHandleBlock:^{
+        [SVProgressHUD showInfoWithStatus:@"您的登录状态已失效, 请重新登录."];
+    } forErrorCode:MRRequestErrorCodeOAuthCommonRequestHeavilyError];
+    
+    [MRRequest setHandleBlock:^{
+        [SVProgressHUD showInfoWithStatus:[MRRequest currentError].localizedDescription];
+    } forErrorCode:MRRequestErrorCodeDynamicError];
     
     [UIStoryboard setStoryboardNames:@[@"Main",
                                        @"OAuthRequest",

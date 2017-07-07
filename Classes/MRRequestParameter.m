@@ -202,7 +202,9 @@
             if (![NSString isValidString:sign]) sign = notEmptyKeyValueMap.formattedIntoFormStyleString.md5Hash;
             oAuthDynamicParameter[@"sign"] = sign;
             
-            NSLog(@"oAuthDynamicParameter %@", oAuthDynamicParameter);
+            if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
+                NSLog(@"[OAUTH] ▫️ DynamicParameter <%@: %p> %@", oAuthDynamicParameter.superclass, oAuthDynamicParameter, oAuthDynamicParameter);
+            }
             
             validJSONObjectOrString = oAuthDynamicParameter;
             

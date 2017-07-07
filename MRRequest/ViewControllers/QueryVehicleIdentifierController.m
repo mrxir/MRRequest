@@ -14,6 +14,8 @@
 
 #import <MRFramework/NSObject+Extension.h>
 
+#import <UIView+Toast.h>
+
 @interface QueryVehicleIdentifierController ()
 
 @property (nonatomic, strong) NSMutableDictionary *queryInfo;
@@ -98,7 +100,11 @@
         
         self.resultTextView.text = error.description;
         
-        [SVProgressHUD showErrorWithStatus:@"VIN查询失败"];
+        if (error.code == MRRequestErrorCodeEqualRequestError) {
+            [self.view makeToast:error.localizedDescription];
+        } else {
+            [SVProgressHUD showErrorWithStatus:error.localizedDescription];
+        }
         
     }];
 }

@@ -123,8 +123,12 @@
         
         self.resultTextView.text = error.description;
         
-        [SVProgressHUD showErrorWithStatus:@"获取访问令牌失败"];
-        
+        if (error.code == MRRequestErrorCodeEqualRequestError) {
+            [self.view makeToast:error.localizedDescription];
+        } else {
+            [SVProgressHUD showErrorWithStatus:error.localizedDescription];
+        }
+                
     }];
     
 }

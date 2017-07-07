@@ -39,6 +39,12 @@
 					<key>description</key>
 					<string>OAuth2.0 查询车辆识别码</string>
 				</dict>
+				<dict>
+					<key>identifier</key>
+					<string>OAuthErrorCodeHandleController</string>
+					<key>description</key>
+					<string>OAuth2.0 错误码处理演示</string>
+				</dict>
 			</array>
 		</dict>
 		<dict>

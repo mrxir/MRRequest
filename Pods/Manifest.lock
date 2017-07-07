@@ -2,17 +2,20 @@ PODS:
   - IQKeyboardManager (4.0.10)
   - MRFramework (1.0.1)
   - SVProgressHUD (2.1.2)
+  - Toast (3.1.0)
 
 DEPENDENCIES:
   - IQKeyboardManager (~> 4.0.10)
   - MRFramework (~> 1.0.1)
   - SVProgressHUD (~> 2.1.2)
+  - Toast (~> 3.1.0)
 
 SPEC CHECKSUMS:
   IQKeyboardManager: 593ee99b88381f4b9ccb22bd680f22606351bd41
   MRFramework: 68062034876d083207e401be7427c4832ac2f004
   SVProgressHUD: c404a55d78acbeb7ebb78b76d3faf986475a6994
+  Toast: 14a93686d6c8bfe2727afd342414e35660a8a1f3
 
-PODFILE CHECKSUM: 1b1310bf11383d0a013e8ac0bdc696692904ca6c
+PODFILE CHECKSUM: 895ed95bc6a677e40390de28fb45c676aa129d49
 
 COCOAPODS: 1.2.1

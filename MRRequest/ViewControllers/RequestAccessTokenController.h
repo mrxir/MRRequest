@@ -16,6 +16,8 @@
 
 #import <SVProgressHUD.h>
 
+#import <UIView+Toast.h>
+
 @interface RequestAccessTokenController : UIViewController
 
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *resetItem;

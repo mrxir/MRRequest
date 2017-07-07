@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12088"/>
+        <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
         <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
         <capability name="Navigation items with more than one left or right bar item" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -454,6 +455,7 @@
                 <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="plc-Cj-FaV" sceneMemberID="viewController">
                     <toolbarItems/>
                     <tabBar key="tabBar" contentMode="scaleToFill" id="Ctr-J4-6Tu">
+                        <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     </tabBar>
@@ -463,6 +465,7 @@
                         <segue destination="nt8-pc-GeQ" kind="relationship" relationship="viewControllers" id="nXl-wK-eGV"/>
                         <segue destination="UrL-H3-fg2" kind="relationship" relationship="viewControllers" id="pZV-Xf-p8g"/>
                         <segue destination="8BI-34-5Kj" kind="relationship" relationship="viewControllers" id="mFd-PF-xfd"/>
+                        <segue destination="65N-5F-ANZ" kind="relationship" relationship="viewControllers" id="sIa-Ka-IfD"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="I2w-11-KKp" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1019,6 +1022,317 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xGZ-mY-WiL" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1174" y="4251"/>
+        </scene>
+        <!--OAuth2.0错误码处理演示-->
+        <scene sceneID="e5n-gg-kpN">
+            <objects>
+                <viewController storyboardIdentifier="OAuthErrorCodeHandleController" id="o0f-S1-hpN" customClass="OAuthErrorCodeHandleController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="pf5-89-Xfy"/>
+                        <viewControllerLayoutGuide type="bottom" id="W5X-IW-abq"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="e6e-Bb-qx4">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="984"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="rxS-yX-1yf">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="984"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <view key="tableHeaderView" contentMode="scaleToFill" id="ggp-nl-HEZ">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="920"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <subviews>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oDg-L3-TdZ">
+                                            <rect key="frame" x="10" y="172" width="355" height="44"/>
+                                            <color key="backgroundColor" red="0.50196081400000003" green="0.25098040700000002" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="44" id="kIK-Zw-wx4"/>
+                                            </constraints>
+                                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <inset key="contentEdgeInsets" minX="20" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                            <state key="normal" title="NEED JAVA Let &quot;client_id&quot; invalid "/>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sml-zw-NbM">
+                                            <rect key="frame" x="10" y="226" width="355" height="44"/>
+                                            <color key="backgroundColor" red="0.50196081400000003" green="0.25098040700000002" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="44" id="t3M-og-3xQ"/>
+                                            </constraints>
+                                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <inset key="contentEdgeInsets" minX="20" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                            <state key="normal" title="NEED JAVA Let &quot;client_secret&quot; invalid"/>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bf3-Qp-pVK">
+                                            <rect key="frame" x="10" y="280" width="355" height="44"/>
+                                            <color key="backgroundColor" red="0.50196081400000003" green="0.25098040700000002" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="44" id="2FF-Uk-r23"/>
+                                            </constraints>
+                                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <inset key="contentEdgeInsets" minX="20" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                            <state key="normal" title="Let &quot;username&quot; invalid"/>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aqw-mc-yvU">
+                                            <rect key="frame" x="10" y="334" width="355" height="44"/>
+                                            <color key="backgroundColor" red="0.50196081400000003" green="0.25098040700000002" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="44" id="tNi-d7-yBa"/>
+                                            </constraints>
+                                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <inset key="contentEdgeInsets" minX="20" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                            <state key="normal" title="Let &quot;password&quot; invalid"/>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="KaG-lz-pdG">
+                                            <rect key="frame" x="10" y="388" width="355" height="44"/>
+                                            <color key="backgroundColor" red="0.50196081400000003" green="0.25098040700000002" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="44" id="s4Y-0I-jKM"/>
+                                            </constraints>
+                                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <inset key="contentEdgeInsets" minX="20" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                            <state key="normal" title="Let &quot;grant_type&quot; invalid"/>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2ip-zp-inE">
+                                            <rect key="frame" x="10" y="442" width="355" height="44"/>
+                                            <color key="backgroundColor" red="0.50196081400000003" green="0.25098040700000002" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="44" id="uyh-vz-nGp"/>
+                                            </constraints>
+                                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <inset key="contentEdgeInsets" minX="20" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                            <state key="normal" title="Let &quot;sign&quot; invalid"/>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="y7F-Lm-T2O">
+                                            <rect key="frame" x="10" y="496" width="355" height="44"/>
+                                            <color key="backgroundColor" red="0.50196081400000003" green="0.25098040700000002" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="44" id="I1c-PL-FJW"/>
+                                            </constraints>
+                                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <inset key="contentEdgeInsets" minX="20" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                            <state key="normal" title="Let &quot;format&quot; invalid"/>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mZt-Ld-Vga">
+                                            <rect key="frame" x="10" y="550" width="355" height="44"/>
+                                            <color key="backgroundColor" red="0.50196081400000003" green="0.25098040700000002" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="44" id="cGd-W9-BAo"/>
+                                            </constraints>
+                                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <inset key="contentEdgeInsets" minX="20" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                            <state key="normal" title="Let &quot;access_token&quot; invalid"/>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WRV-6V-scC">
+                                            <rect key="frame" x="10" y="604" width="355" height="44"/>
+                                            <color key="backgroundColor" red="0.50196081400000003" green="0.25098040700000002" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="44" id="sxq-V6-u7L"/>
+                                            </constraints>
+                                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <inset key="contentEdgeInsets" minX="20" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                            <state key="normal" title="Let &quot;refresh_token&quot; invalid"/>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="t12-uN-Op3">
+                                            <rect key="frame" x="10" y="658" width="355" height="44"/>
+                                            <color key="backgroundColor" red="0.50196081400000003" green="0.25098040700000002" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="44" id="OFf-33-gbx"/>
+                                            </constraints>
+                                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <inset key="contentEdgeInsets" minX="20" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                            <state key="normal" title="Let request parameter invalid"/>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="34E-pc-XO6">
+                                            <rect key="frame" x="192.5" y="118" width="172.5" height="44"/>
+                                            <color key="backgroundColor" red="0.0" green="0.50196081400000003" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="44" id="7fw-2e-0Gr"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <state key="normal" title="执行OAuth普通业务请求"/>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="khc-cA-wLG">
+                                            <rect key="frame" x="10" y="118" width="172.5" height="44"/>
+                                            <color key="backgroundColor" red="0.0" green="0.50196081400000003" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="44" id="PW4-eq-gMa"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <state key="normal" title="生成OAuth普通业务请求"/>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5o6-Ee-OTp">
+                                            <rect key="frame" x="192.5" y="10" width="172.5" height="44"/>
+                                            <color key="backgroundColor" red="0.0" green="0.50196081400000003" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="44" id="pJs-Eb-p3g"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <state key="normal" title="执行获取授权请求"/>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BeT-1F-gP1">
+                                            <rect key="frame" x="10" y="64" width="172.5" height="44"/>
+                                            <color key="backgroundColor" red="0.0" green="0.50196081400000003" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="44" id="Yuh-mV-5h7"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <state key="normal" title="生成续约授权请求"/>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cQO-cV-sJX">
+                                            <rect key="frame" x="192.5" y="64" width="172.5" height="44"/>
+                                            <color key="backgroundColor" red="0.0" green="0.50196081400000003" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="44" id="Mhk-iQ-T23"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <state key="normal" title="执行续约授权请求"/>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oRc-DA-dGn">
+                                            <rect key="frame" x="10" y="10" width="172.5" height="44"/>
+                                            <color key="backgroundColor" red="0.0" green="0.50196081400000003" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="44" id="ODN-Pd-7Xc"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <state key="normal" title="生成获取授权请求"/>
+                                        </button>
+                                    </subviews>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <constraints>
+                                        <constraint firstItem="5o6-Ee-OTp" firstAttribute="leading" secondItem="ggp-nl-HEZ" secondAttribute="centerX" constant="5" id="189-Lc-jkf"/>
+                                        <constraint firstItem="mZt-Ld-Vga" firstAttribute="top" secondItem="y7F-Lm-T2O" secondAttribute="bottom" constant="10" id="21d-Jo-RYd"/>
+                                        <constraint firstAttribute="trailing" secondItem="bf3-Qp-pVK" secondAttribute="trailing" constant="10" id="2OB-Mm-vdC"/>
+                                        <constraint firstAttribute="trailing" secondItem="y7F-Lm-T2O" secondAttribute="trailing" constant="10" id="4Wv-6k-iuJ"/>
+                                        <constraint firstAttribute="trailing" secondItem="WRV-6V-scC" secondAttribute="trailing" constant="10" id="6G4-fz-Eri"/>
+                                        <constraint firstAttribute="centerX" secondItem="khc-cA-wLG" secondAttribute="trailing" constant="5" id="9Je-IG-B9L"/>
+                                        <constraint firstItem="cQO-cV-sJX" firstAttribute="leading" secondItem="ggp-nl-HEZ" secondAttribute="centerX" constant="5" id="BhY-pa-b6F"/>
+                                        <constraint firstItem="2ip-zp-inE" firstAttribute="top" secondItem="KaG-lz-pdG" secondAttribute="bottom" constant="10" id="BpC-Ca-Ngi"/>
+                                        <constraint firstItem="khc-cA-wLG" firstAttribute="leading" secondItem="ggp-nl-HEZ" secondAttribute="leading" constant="10" id="DNk-cQ-Mnl"/>
+                                        <constraint firstItem="bf3-Qp-pVK" firstAttribute="top" secondItem="sml-zw-NbM" secondAttribute="bottom" constant="10" id="DPj-DM-qa3"/>
+                                        <constraint firstItem="y7F-Lm-T2O" firstAttribute="leading" secondItem="ggp-nl-HEZ" secondAttribute="leading" constant="10" id="Hvn-eB-Bnn"/>
+                                        <constraint firstItem="cQO-cV-sJX" firstAttribute="top" secondItem="5o6-Ee-OTp" secondAttribute="bottom" constant="10" id="KJR-zg-O4b"/>
+                                        <constraint firstAttribute="centerX" secondItem="oRc-DA-dGn" secondAttribute="trailing" constant="5" id="L9N-C9-LUw"/>
+                                        <constraint firstAttribute="centerX" secondItem="BeT-1F-gP1" secondAttribute="trailing" constant="5" id="L9v-no-IsI"/>
+                                        <constraint firstItem="34E-pc-XO6" firstAttribute="top" secondItem="cQO-cV-sJX" secondAttribute="bottom" constant="10" id="Mjd-TN-JKn"/>
+                                        <constraint firstItem="BeT-1F-gP1" firstAttribute="top" secondItem="5o6-Ee-OTp" secondAttribute="bottom" constant="10" id="OOj-dD-A4M"/>
+                                        <constraint firstAttribute="trailing" secondItem="34E-pc-XO6" secondAttribute="trailing" constant="10" id="OW5-fS-kq9"/>
+                                        <constraint firstAttribute="trailing" secondItem="5o6-Ee-OTp" secondAttribute="trailing" constant="10" id="OZC-YT-XBz"/>
+                                        <constraint firstAttribute="trailing" secondItem="2ip-zp-inE" secondAttribute="trailing" constant="10" id="Q6x-HX-4wo"/>
+                                        <constraint firstAttribute="trailing" secondItem="oDg-L3-TdZ" secondAttribute="trailing" constant="10" id="Qe8-Bj-Lut"/>
+                                        <constraint firstItem="sml-zw-NbM" firstAttribute="top" secondItem="oDg-L3-TdZ" secondAttribute="bottom" constant="10" id="TJh-nW-St9"/>
+                                        <constraint firstItem="aqw-mc-yvU" firstAttribute="leading" secondItem="ggp-nl-HEZ" secondAttribute="leading" constant="10" id="TKi-Yr-8rD"/>
+                                        <constraint firstItem="mZt-Ld-Vga" firstAttribute="leading" secondItem="ggp-nl-HEZ" secondAttribute="leading" constant="10" id="XMX-gu-T9f"/>
+                                        <constraint firstItem="y7F-Lm-T2O" firstAttribute="top" secondItem="2ip-zp-inE" secondAttribute="bottom" constant="10" id="ad3-56-KyR"/>
+                                        <constraint firstItem="oDg-L3-TdZ" firstAttribute="leading" secondItem="ggp-nl-HEZ" secondAttribute="leading" constant="10" id="bBw-M7-Mm0"/>
+                                        <constraint firstItem="KaG-lz-pdG" firstAttribute="top" secondItem="aqw-mc-yvU" secondAttribute="bottom" constant="10" id="bSQ-ar-Zag"/>
+                                        <constraint firstAttribute="trailing" secondItem="aqw-mc-yvU" secondAttribute="trailing" constant="10" id="cFB-ON-lRz"/>
+                                        <constraint firstItem="WRV-6V-scC" firstAttribute="leading" secondItem="ggp-nl-HEZ" secondAttribute="leading" constant="10" id="dNV-td-Pxa"/>
+                                        <constraint firstItem="t12-uN-Op3" firstAttribute="top" secondItem="WRV-6V-scC" secondAttribute="bottom" constant="10" id="eur-4r-JXf"/>
+                                        <constraint firstItem="WRV-6V-scC" firstAttribute="top" secondItem="mZt-Ld-Vga" secondAttribute="bottom" constant="10" id="fbH-En-AMx"/>
+                                        <constraint firstItem="khc-cA-wLG" firstAttribute="top" secondItem="cQO-cV-sJX" secondAttribute="bottom" constant="10" id="gxH-xJ-bOw"/>
+                                        <constraint firstItem="oRc-DA-dGn" firstAttribute="leading" secondItem="ggp-nl-HEZ" secondAttribute="leading" constant="10" id="hau-vu-ICe"/>
+                                        <constraint firstItem="BeT-1F-gP1" firstAttribute="leading" secondItem="ggp-nl-HEZ" secondAttribute="leading" constant="10" id="hpY-4X-BoA"/>
+                                        <constraint firstAttribute="trailing" secondItem="t12-uN-Op3" secondAttribute="trailing" constant="10" id="hwW-8x-feG"/>
+                                        <constraint firstItem="aqw-mc-yvU" firstAttribute="top" secondItem="bf3-Qp-pVK" secondAttribute="bottom" constant="10" id="iYd-gw-phw"/>
+                                        <constraint firstItem="2ip-zp-inE" firstAttribute="leading" secondItem="ggp-nl-HEZ" secondAttribute="leading" constant="10" id="nzk-LD-lPM"/>
+                                        <constraint firstItem="oDg-L3-TdZ" firstAttribute="top" secondItem="khc-cA-wLG" secondAttribute="bottom" constant="10" id="o2J-T6-OUW"/>
+                                        <constraint firstItem="KaG-lz-pdG" firstAttribute="leading" secondItem="ggp-nl-HEZ" secondAttribute="leading" constant="10" id="omz-wc-0Kj"/>
+                                        <constraint firstItem="sml-zw-NbM" firstAttribute="leading" secondItem="ggp-nl-HEZ" secondAttribute="leading" constant="10" id="rUY-Mb-qHm"/>
+                                        <constraint firstItem="bf3-Qp-pVK" firstAttribute="leading" secondItem="ggp-nl-HEZ" secondAttribute="leading" constant="10" id="sAP-QM-uaA"/>
+                                        <constraint firstAttribute="trailing" secondItem="sml-zw-NbM" secondAttribute="trailing" constant="10" id="tP0-P4-SYL"/>
+                                        <constraint firstAttribute="trailing" secondItem="cQO-cV-sJX" secondAttribute="trailing" constant="10" id="v4E-qf-DaI"/>
+                                        <constraint firstItem="oRc-DA-dGn" firstAttribute="top" secondItem="ggp-nl-HEZ" secondAttribute="top" constant="10" id="vz0-Ta-3Wk"/>
+                                        <constraint firstItem="34E-pc-XO6" firstAttribute="leading" secondItem="ggp-nl-HEZ" secondAttribute="centerX" constant="5" id="wZP-wO-o3T"/>
+                                        <constraint firstItem="5o6-Ee-OTp" firstAttribute="top" secondItem="ggp-nl-HEZ" secondAttribute="top" constant="10" id="xyY-tg-5Xh"/>
+                                        <constraint firstItem="t12-uN-Op3" firstAttribute="leading" secondItem="ggp-nl-HEZ" secondAttribute="leading" constant="10" id="yJw-ZT-bg6"/>
+                                        <constraint firstAttribute="trailing" secondItem="KaG-lz-pdG" secondAttribute="trailing" constant="10" id="yiK-3o-rLn"/>
+                                        <constraint firstAttribute="trailing" secondItem="mZt-Ld-Vga" secondAttribute="trailing" constant="10" id="zCD-QS-ykC"/>
+                                    </constraints>
+                                </view>
+                            </tableView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bTa-nI-QkE">
+                                <rect key="frame" x="15" y="784" width="345" height="200"/>
+                                <subviews>
+                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="REQUEST RESULT IS HERE" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="gMB-TH-li3">
+                                        <rect key="frame" x="4" y="4" width="337" height="192"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                        <fontDescription key="fontDescription" type="system" weight="thin" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                    </textView>
+                                </subviews>
+                                <color key="backgroundColor" red="0.8964285674462813" green="0.94149966680426855" blue="1" alpha="0.95842251712328763" colorSpace="custom" customColorSpace="displayP3"/>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="gMB-TH-li3" secondAttribute="bottom" constant="4" id="BnW-TY-w2b"/>
+                                    <constraint firstItem="gMB-TH-li3" firstAttribute="top" secondItem="bTa-nI-QkE" secondAttribute="top" constant="4" id="EYX-cO-uFg"/>
+                                    <constraint firstItem="gMB-TH-li3" firstAttribute="leading" secondItem="bTa-nI-QkE" secondAttribute="leading" constant="4" id="XE2-UR-OtI"/>
+                                    <constraint firstAttribute="height" constant="200" id="ehl-Gv-T2g"/>
+                                    <constraint firstAttribute="trailing" secondItem="gMB-TH-li3" secondAttribute="trailing" constant="4" id="k2e-oy-4BI"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="rxS-yX-1yf" firstAttribute="top" secondItem="e6e-Bb-qx4" secondAttribute="top" id="8XX-qg-b1R"/>
+                            <constraint firstItem="bTa-nI-QkE" firstAttribute="leading" secondItem="e6e-Bb-qx4" secondAttribute="leading" constant="15" id="9Wt-Qo-bjp"/>
+                            <constraint firstAttribute="trailing" secondItem="rxS-yX-1yf" secondAttribute="trailing" id="agK-se-Vq7"/>
+                            <constraint firstAttribute="trailing" secondItem="bTa-nI-QkE" secondAttribute="trailing" constant="15" id="e4o-lj-Ygv"/>
+                            <constraint firstAttribute="bottom" secondItem="bTa-nI-QkE" secondAttribute="bottom" id="gEs-ZI-anR"/>
+                            <constraint firstAttribute="bottom" secondItem="rxS-yX-1yf" secondAttribute="bottom" id="ue4-Xb-Zfi"/>
+                            <constraint firstItem="rxS-yX-1yf" firstAttribute="leading" secondItem="e6e-Bb-qx4" secondAttribute="leading" id="znd-aS-du0"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="OAuth2.0错误码处理演示" id="PFx-My-TvX"/>
+                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <size key="freeformSize" width="375" height="984"/>
+                    <connections>
+                        <outlet property="executeCommonButton" destination="34E-pc-XO6" id="AGV-ju-Rfq"/>
+                        <outlet property="executeOAuthButton" destination="5o6-Ee-OTp" id="Grt-JH-5ri"/>
+                        <outlet property="executeUpdateButton" destination="34E-pc-XO6" id="pfY-jD-KPh"/>
+                        <outlet property="generateCommonButton" destination="khc-cA-wLG" id="rG8-rD-5ud"/>
+                        <outlet property="generateOAuthButton" destination="oRc-DA-dGn" id="lm2-ta-kDS"/>
+                        <outlet property="generateUpdateButton" destination="khc-cA-wLG" id="Tkw-mW-spK"/>
+                        <outlet property="invalidate_access_token" destination="mZt-Ld-Vga" id="zQu-EA-F2o"/>
+                        <outlet property="invalidate_client_id" destination="oDg-L3-TdZ" id="Eeb-0K-zLQ"/>
+                        <outlet property="invalidate_client_secret" destination="sml-zw-NbM" id="o66-ut-cA4"/>
+                        <outlet property="invalidate_format" destination="y7F-Lm-T2O" id="tAi-M2-X9a"/>
+                        <outlet property="invalidate_grant_type" destination="KaG-lz-pdG" id="cfc-AN-r6z"/>
+                        <outlet property="invalidate_parameter" destination="t12-uN-Op3" id="Oak-XT-S1B"/>
+                        <outlet property="invalidate_password" destination="aqw-mc-yvU" id="Tcd-hh-aTK"/>
+                        <outlet property="invalidate_refresh_token" destination="WRV-6V-scC" id="ZKl-HZ-f1R"/>
+                        <outlet property="invalidate_sign" destination="2ip-zp-inE" id="KQr-Jw-iEt"/>
+                        <outlet property="invalidate_username" destination="bf3-Qp-pVK" id="Zln-Nv-cqf"/>
+                        <outlet property="resultTextView" destination="gMB-TH-li3" id="HGi-6d-yJm"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="AkU-hf-4Zz" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1173.5999999999999" y="5112.1439280359828"/>
+        </scene>
+        <!--Item-->
+        <scene sceneID="qzl-zH-8YE">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="65N-5F-ANZ" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Item" id="hHG-db-TnD"/>
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="y1l-m4-XtF">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="o0f-S1-hpN" kind="relationship" relationship="rootViewController" id="iDu-w2-Atb"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="sCm-oM-OT6" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="394" y="5113"/>
         </scene>
     </scenes>
 </document>

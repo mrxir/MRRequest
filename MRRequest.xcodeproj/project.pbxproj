@@ -25,6 +25,8 @@
 		6775766A1F0E0EA800715F6B /* AccountLoginController.m in Sources */ = {isa = PBXBuildFile; fileRef = 677576691F0E0EA800715F6B /* AccountLoginController.m */; };
 		6775766D1F0E0ED200715F6B /* MobileLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6775766C1F0E0ED200715F6B /* MobileLoginViewController.m */; };
 		677576701F0E1B7900715F6B /* QueryVehicleIdentifierController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6775766F1F0E1B7900715F6B /* QueryVehicleIdentifierController.m */; };
+		677576731F0F3C4400715F6B /* OAuthErrorCodeHandleController.m in Sources */ = {isa = PBXBuildFile; fileRef = 677576721F0F3C4400715F6B /* OAuthErrorCodeHandleController.m */; };
+		677576791F0F6BF600715F6B /* MRRequestErrorHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 677576781F0F6BF600715F6B /* MRRequestErrorHandler.m */; };
 		FE1F755BCE615014EF092A09 /* libPods-MRRequest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B58F8507383BFEB2C7C47D3 /* libPods-MRRequest.a */; };
 /* End PBXBuildFile section */
 
@@ -62,6 +64,10 @@
 		6775766C1F0E0ED200715F6B /* MobileLoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MobileLoginViewController.m; sourceTree = "<group>"; };
 		6775766E1F0E1B7900715F6B /* QueryVehicleIdentifierController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QueryVehicleIdentifierController.h; sourceTree = "<group>"; };
 		6775766F1F0E1B7900715F6B /* QueryVehicleIdentifierController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QueryVehicleIdentifierController.m; sourceTree = "<group>"; };
+		677576711F0F3C4400715F6B /* OAuthErrorCodeHandleController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OAuthErrorCodeHandleController.h; sourceTree = "<group>"; };
+		677576721F0F3C4400715F6B /* OAuthErrorCodeHandleController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OAuthErrorCodeHandleController.m; sourceTree = "<group>"; };
+		677576771F0F6BF600715F6B /* MRRequestErrorHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MRRequestErrorHandler.h; sourceTree = "<group>"; };
+		677576781F0F6BF600715F6B /* MRRequestErrorHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MRRequestErrorHandler.m; sourceTree = "<group>"; };
 		E0A76381132CEEA4E6FDC8B1 /* Pods-MRRequest.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MRRequest.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MRRequest/Pods-MRRequest.debug.xcconfig"; sourceTree = "<group>"; };
 		FACBC04A2AAC7CB9A6F07D4A /* Pods-MRRequest.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MRRequest.release.xcconfig"; path = "Pods/Target Support Files/Pods-MRRequest/Pods-MRRequest.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -137,11 +143,13 @@
 			children = (
 				6704141E1F050EF8005BDF55 /* MRRequest.h */,
 				6704141F1F050EF8005BDF55 /* MRRequest.m */,
+				670414371F05F113005BDF55 /* MRRequestDelegate.h */,
 				670414211F0511EF005BDF55 /* MRRequestManager.h */,
 				670414221F0511EF005BDF55 /* MRRequestManager.m */,
 				670413D41F04D74B005BDF55 /* MRRequestParameter.h */,
 				670413D51F04D74B005BDF55 /* MRRequestParameter.m */,
-				670414371F05F113005BDF55 /* MRRequestDelegate.h */,
+				677576771F0F6BF600715F6B /* MRRequestErrorHandler.h */,
+				677576781F0F6BF600715F6B /* MRRequestErrorHandler.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -169,6 +177,8 @@
 				6775766C1F0E0ED200715F6B /* MobileLoginViewController.m */,
 				6775766E1F0E1B7900715F6B /* QueryVehicleIdentifierController.h */,
 				6775766F1F0E1B7900715F6B /* QueryVehicleIdentifierController.m */,
+				677576711F0F3C4400715F6B /* OAuthErrorCodeHandleController.h */,
+				677576721F0F3C4400715F6B /* OAuthErrorCodeHandleController.m */,
 			);
 			name = "OAuth Module";
 			sourceTree = "<group>";
@@ -317,6 +327,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				677576731F0F3C4400715F6B /* OAuthErrorCodeHandleController.m in Sources */,
 				670414231F0511EF005BDF55 /* MRRequestManager.m in Sources */,
 				670412BE1F02039A005BDF55 /* AppDelegate.m in Sources */,
 				677576701F0E1B7900715F6B /* QueryVehicleIdentifierController.m in Sources */,
@@ -328,6 +339,7 @@
 				670412BB1F02039A005BDF55 /* main.m in Sources */,
 				670414201F050EF8005BDF55 /* MRRequest.m in Sources */,
 				670414361F05E05D005BDF55 /* WeatherQueryController.m in Sources */,
+				677576791F0F6BF600715F6B /* MRRequestErrorHandler.m in Sources */,
 				677576641F0DE45600715F6B /* RefreshAccessTokenController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

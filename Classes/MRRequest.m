@@ -283,7 +283,6 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
         NSLog(@"[MRREQUEST] ▫️ %s", __FUNCTION__);
         NSLog(@"[MRREQUEST] ▫️ %@", self);
-        //NSLog(@"[MRREQUEST] ▫️ %@", self.parameter);
         
     }
     
@@ -412,40 +411,44 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
 {
-   NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
+        NSLog(@"[MRREQUEST] ▫️ %s", __FUNCTION__);
+    }
     
-    if ([httpResponse isKindOfClass:[NSHTTPURLResponse class]]) {
+    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelError) {
         
-        NSInteger statusCode = httpResponse.statusCode;
+        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
         
-        if (statusCode != 200) {
+        if ([httpResponse isKindOfClass:[NSHTTPURLResponse class]]) {
             
-            NSError *error = [NSError errorWithDomain:MRRequestErrorDomain
-                                                 code:statusCode
-                                             userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString([NSHTTPURLResponse localizedStringForStatusCode:statusCode], nil)}];
+            NSInteger statusCode = httpResponse.statusCode;
             
-            if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelError) {
-                NSLog(@"[MRREQUEST] ❗️ %@", error);
+            if (statusCode != 200) {
+                
+                NSLog(@"[MRREQUEST] ❗️ %@", httpResponse);
+                
             }
-            
-            [self exit];
-            
-            self.anyError = error;
-
-            [self failed];
             
         }
         
     }
+
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
+    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
+        NSLog(@"[MRREQUEST] ▫️ %s", __FUNCTION__);
+    }
+    
     [self.receiveData appendData:data];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
+    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
+        NSLog(@"[MRREQUEST] ▫️ %s", __FUNCTION__);
+    }
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     
@@ -472,6 +475,11 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
+    
+    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
+        NSLog(@"[MRREQUEST] ❗️ %s", __FUNCTION__);
+    }
+    
     self.anyError = error;
     
     [self failed];
@@ -678,6 +686,26 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     return [MRRequestManager defaultManager].logLevel;
 }
 
++ (void)setHandleBlock:(dispatch_block_t)block forErrorCode:(MRRequestErrorCode)code
+{
+    [[MRRequestErrorHandler defaultManager] setHandleBlock:block forErrorCode:code];
+}
+
++ (dispatch_block_t)handleBlockForErrorCode:(MRRequestErrorCode)code
+{
+    return [[MRRequestErrorHandler defaultManager] handleBlockForErrorCode:code];
+}
+
++ (void)handleError:(NSError *)error
+{
+    [[MRRequestErrorHandler defaultManager] handleError:error];
+}
+
++ (NSError *)currentError
+{
+    return [[MRRequestErrorHandler defaultManager] currentError];
+}
+
 @end
 
 
@@ -715,8 +743,8 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
                                          code:666
                                      userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"OAuth信息设置有误, 请检查 😨", nil),
                                                 @"oauth": @{@"server": [NSString stringWithFormat:@"%@", server],
-                                                            @"clientId": [NSString stringWithFormat:@"%@", clientId],
-                                                            @"clientSecret": [NSString stringWithFormat:@"%@", clientSecret],
+                                                            @"client_id": [NSString stringWithFormat:@"%@", clientId],
+                                                            @"client_secret": [NSString stringWithFormat:@"%@", clientSecret],
                                                             @"autodestructTimeInterval": @(autodestructTimeInterval)}}];
             
             if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelError) {

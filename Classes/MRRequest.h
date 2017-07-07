@@ -9,36 +9,14 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-#import "MRRequestManager.h"
-#import "MRRequestParameter.h"
 #import "MRRequestDelegate.h"
 
+#import "MRRequestManager.h"
+#import "MRRequestParameter.h"
+#import "MRRequestErrorHandler.h"
+
+
 FOUNDATION_EXPORT NSErrorDomain const MRRequestErrorDomain;
-
-
-/**
- MRRequest 错误码
-
- - MRRequestErrorCodeEqualRequestError:                 重复请求
- 
- - MRRequestErrorCodeOAuthRequestError:                 OAuth授权获取时发生错误
- - MRRequestErrorCodeOAuthRenewalError:                 OAuth授权续约时发生错误
- 
- - MRRequestErrorCodeOAuthCommonRequestLightlyError:    OAuth普通请求时发生轻微错误
- - MRRequestErrorCodeOAuthCommonRequestHeavilyError:    OAuth普通请求时发生严重错误
- 
- */
-typedef NS_ENUM(NSUInteger, MRRequestErrorCode) {
-    
-    MRRequestErrorCodeEqualRequestError                 = 7782222,
-    
-    MRRequestErrorCodeOAuthRequestError                 = 7782400,
-    MRRequestErrorCodeOAuthRenewalError                 = 7782401,
-    
-    MRRequestErrorCodeOAuthCommonRequestLightlyError    = 7782500,
-    MRRequestErrorCodeOAuthCommonRequestHeavilyError    = 7782501,
-    
-};
 
 typedef void(^Progress)(MRRequest *request, CGFloat progress);
 typedef void(^Success)(MRRequest *request, id receiveObject);
@@ -105,6 +83,29 @@ typedef void(^Failure)(MRRequest *request, id requestObject, NSData *data, NSErr
  */
 + (void)setLogLevel:(MRRequestLogLevel)level;
 + (MRRequestLogLevel)logLevel;
+
+/**
+ 设置MRRequest错误码处理block
+
+ @param block 代码块
+ @param code 错误码
+ */
++ (void)setHandleBlock:(dispatch_block_t)block forErrorCode:(MRRequestErrorCode)code;
++ (dispatch_block_t)handleBlockForErrorCode:(MRRequestErrorCode)code;
+
+/**
+ 当前MRRequest错误
+
+ @return 当前被抛出的MRRequest错误
+ */
++ (NSError *)currentError;
+
+/**
+ 处理MRRequest错误
+
+ @param error MRRequest抛出的错误
+ */
++ (void)handleError:(NSError *)error;
 
 @end
 

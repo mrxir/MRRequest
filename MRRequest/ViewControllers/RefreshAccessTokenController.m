@@ -58,8 +58,8 @@
     NSDateFormatter *timestampDateFormatter = [[NSDateFormatter alloc] init];
     timestampDateFormatter.dateFormat = @"yyyyMMddHHmmssSSS";
     
-    self.oauth_server.text = @"http://10.0.40.119:8080/oauth/token?";
-    self.oauth_autodestruct.text = @"40";
+    self.oauth_server.text = [MROAuthRequestManager defaultManager].server;
+    self.oauth_autodestruct.text = [@([MROAuthRequestManager defaultManager].oAuthInfoAutodestructTimeInterval) stringValue];
     
     self.oauth_client_id.text = [MROAuthRequestManager defaultManager].client_id;
     self.oauth_client_secret.text = [MROAuthRequestManager defaultManager].client_secret;

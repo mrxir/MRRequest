@@ -15,6 +15,8 @@
 
 #import <SVProgressHUD.h>
 
+#import <UIView+Toast.h>
+
 @interface AccountLoginController ()
 
 @property (nonatomic, strong) NSMutableDictionary *loginInfo;
@@ -95,19 +97,36 @@
     parameter.requestMethod = MRRequestParameterRequestMethodPost;
     parameter.formattedStyle = MRRequestParameterFormattedStyleForm;
     
-    [SVProgressHUD showWithStatus:@"正在登录..."];
+    [SVProgressHUD showWithStatus:@"正在登录"];
     
     [MRRequest requestWithPath:path parameter:parameter success:^(MRRequest *request, id receiveObject) {
         
-        [SVProgressHUD dismissWithDelay:1];
+        [SVProgressHUD showWithStatus:@"登录成功"];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [SVProgressHUD showWithStatus:@"3秒后返回"];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [SVProgressHUD showWithStatus:@"2秒后返回"];
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    [SVProgressHUD showWithStatus:@"1秒后返回"];
+                });
+            });
+            [SVProgressHUD dismissWithDelay:3 completion:^{
+                [self.navigationController popViewControllerAnimated:YES];
+            }];
+        });
         
         self.resultTextView.text = [NSString stringWithFormat:@"%@", [receiveObject stringWithUTF8]];
+        
         
     } failure:^(MRRequest *request, id requestObject, NSData *data, NSError *error) {
         
         self.resultTextView.text = error.description;
         
-        [SVProgressHUD showErrorWithStatus:@"用户名或密码错误"];
+        if (error.code == MRRequestErrorCodeEqualRequestError) {
+            [self.view makeToast:error.localizedDescription];
+        } else {
+            [SVProgressHUD showErrorWithStatus:error.localizedDescription];
+        }
         
     }];
 
