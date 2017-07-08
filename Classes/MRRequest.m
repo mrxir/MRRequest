@@ -89,11 +89,11 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
             
             if ([MRRequest logLevel] <= MRRequestLogLevelError) {
                 
-                NSLog(@"[MRREQUEST] ❗️ URL 无效, 已对 path 进行编码, 编码后得到的 URL 依然无效, 若要解决此问题, 请检查 path 及 parameter");
-                NSLog(@"[MRREQUEST] ❗️ path \"%@\"", originPath);
+                NSLog(@"[MRREQUEST] ❗️ URL 无效, 已对 path 进行编码, 编码后得到的 URL 依然无效, 若要解决此问题, 请检查 path 及 parameter.");
+                NSLog(@"[MRREQUEST] ❗️ path \"%@\".", originPath);
                 NSLog(@"[MRREQUEST] ❗️ parameter %@", parameter.object);
-                NSLog(@"[MRREQUEST] ❗️ URL \"%@\"", path);
-                NSLog(@"[MRREQUEST] ❗️ EncodedURL \"%@\"", url.absoluteString);
+                NSLog(@"[MRREQUEST] ❗️ URL \"%@\".", path);
+                NSLog(@"[MRREQUEST] ❗️ EncodedURL \"%@\".", url.absoluteString);
                 
             }
             
@@ -102,10 +102,10 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
             if ([MRRequest logLevel] <= MRRequestLogLevelError) {
                 
                 NSLog(@"[MRREQUEST] ❗️ URL 无效, 已对 path 进行编码, 编码后的 URL 可用, 若要解决此问题, 请检查 path 及 parameter.");
-                NSLog(@"[MRREQUEST] ❗️ path \"%@\"", originPath);
+                NSLog(@"[MRREQUEST] ❗️ path \"%@\".", originPath);
                 NSLog(@"[MRREQUEST] ❗️ parameter %@", parameter.object);
-                NSLog(@"[MRREQUEST] ❗️ URL \"%@\"", path);
-                NSLog(@"[MRREQUEST] ❗️ EncodedURL \"%@\"", url.absoluteString);
+                NSLog(@"[MRREQUEST] ❗️ URL \"%@\".", path);
+                NSLog(@"[MRREQUEST] ❗️ EncodedURL \"%@\".", url.absoluteString);
 
             }
             
@@ -135,7 +135,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
                     
                     if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelWarning) {
                         NSLog(@"[MRREQUEST] ⚠️ URL 中未找到查询标志符 \"?\", 这可能导致服务器无法正确获取业务参数, 如果没有问题, 请忽略这条提示信息, 否则请检查 URL.");
-                        NSLog(@"[MRREQUEST] ⚠️ URL \"%@\"", url.absoluteString);
+                        NSLog(@"[MRREQUEST] ⚠️ URL \"%@\".", url.absoluteString);
                     }
                     
                 }
@@ -243,11 +243,19 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     }
     
     // 判断重复请求
-    
     if ([NSString isValidString:self.parameter.identifier] == YES) {
         self.requestIdentifier = self.parameter.identifier;
     } else {
-        self.requestIdentifier = self.parameter.relativelyStableParameterString;
+        
+        NSString *path = self.path;
+        NSString *relativelyStableParameterString = self.parameter.relativelyStableParameterString;
+        
+        if ([NSString isValidString:relativelyStableParameterString] == YES) {
+            self.requestIdentifier = [path stringByAppendingString:relativelyStableParameterString];
+        } else {
+            self.requestIdentifier = path;
+        }
+        
     }
     
     if ([NSString isValidString:self.requestIdentifier] == YES) {
@@ -452,7 +460,9 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     
-    [[MRRequestManager defaultManager].processingRequestIdentifierSet removeObject:self.requestIdentifier];
+    if ([NSString isValidString:self.requestIdentifier] == YES) {
+        [[MRRequestManager defaultManager].processingRequestIdentifierSet removeObject:self.requestIdentifier];
+    }
     
     // OAuth 开关状态
     BOOL oAuthEnabled = NO;
@@ -718,6 +728,16 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
             autodestructTimeInterval:(NSTimeInterval)autodestructTimeInterval
                             anyError:(NSError *__autoreleasing *)error
 {
+    [MROAuthRequestManager defaultManager].server = server;
+    [MROAuthRequestManager defaultManager].client_id = clientId;
+    [MROAuthRequestManager defaultManager].client_secret = clientSecret;
+    [MROAuthRequestManager defaultManager].oAuthInfoAutodestructTimeInterval = autodestructTimeInterval;
+    
+    return [[MRRequestManager defaultManager] activeOAuth:error];
+
+    
+    
+    
     BOOL shouldEnabled = NO;
 
     if ([NSString isValidString:server] && [NSString isValidString:clientId] && [NSString isValidString:clientSecret]) {
@@ -728,13 +748,9 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     
     if (shouldEnabled == YES) {
         
-        [MROAuthRequestManager defaultManager].server = server;
-        [MROAuthRequestManager defaultManager].client_id = clientId;
-        [MROAuthRequestManager defaultManager].client_secret = clientSecret;
-        [MROAuthRequestManager defaultManager].oAuthInfoAutodestructTimeInterval = autodestructTimeInterval;
         
-        [MRRequestManager defaultManager].oAuthEnabled = YES;
-                
+        
+        
     } else {
         
         if (error != nil) {
@@ -775,22 +791,16 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
 
 @implementation MRRequest (OAuthSetting)
 
+#pragma mark - OAuth 开关
 
-
-#pragma mark - OAuth - oauth request 总开关
-
-+ (void)setOAuthEnabled:(BOOL)enabled
++ (BOOL)activeOAuth:(NSError *__autoreleasing *)error
 {
-    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelInfo) {
-        NSLog(@"[OAUTH] 🔘 OAuth enabled is %d", enabled);
-    }
-    
-    [MRRequestManager defaultManager].oAuthEnabled = enabled;
+    return [[MRRequestManager defaultManager] activeOAuth:error];
 }
 
-+ (BOOL)isOAuthEnabled
++ (void)deactiveOAuth
 {
-    return [MRRequestManager defaultManager].isOAuthEnabled;
+    [[MRRequestManager defaultManager] deactiveOAuth];
 }
 
 
@@ -800,7 +810,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
 + (void)setOAuthServer:(NSString *)server
 {
     if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelInfo) {
-        NSLog(@"[OAUTH] 🔘 OAuth server is %@", server);
+        NSLog(@"[OAUTH] 🔘 OAuth server is \"%@\".", server);
     }
     
     [MROAuthRequestManager defaultManager].server = server;

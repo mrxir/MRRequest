@@ -116,5 +116,89 @@
             </objects>
             <point key="canvasLocation" x="-226.40000000000001" y="133.5832083958021"/>
         </scene>
+        <!--Douban Onlines Controller-->
+        <scene sceneID="4Ti-zg-H4V">
+            <objects>
+                <viewController storyboardIdentifier="DoubanOnlinesController" id="nEG-0f-kE0" customClass="DoubanOnlinesController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="2pO-4W-KWY"/>
+                        <viewControllerLayoutGuide type="bottom" id="ET0-ry-XFW"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="tTl-V3-Jac">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tAK-cd-lpi">
+                                <rect key="frame" x="15" y="84" width="345" height="44"/>
+                                <color key="backgroundColor" red="0.0" green="0.50196081400000003" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="L11-PQ-IEu"/>
+                                </constraints>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <state key="normal" title="Query"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <integer key="value" value="4"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="结果" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hUd-2N-kbx">
+                                <rect key="frame" x="15" y="158" width="350" height="21"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="W94-43-5VA"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="V2Z-DR-6sM">
+                                <rect key="frame" x="10" y="189" width="355" height="468"/>
+                                <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                                <fontDescription key="fontDescription" type="system" weight="thin" pointSize="18"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="ET0-ry-XFW" firstAttribute="top" secondItem="V2Z-DR-6sM" secondAttribute="bottom" constant="10" id="0cY-rE-ESX"/>
+                            <constraint firstAttribute="trailing" secondItem="hUd-2N-kbx" secondAttribute="trailing" constant="10" id="0zi-uu-NAZ"/>
+                            <constraint firstItem="tAK-cd-lpi" firstAttribute="leading" secondItem="tTl-V3-Jac" secondAttribute="leading" constant="15" id="8Gw-k2-HRl"/>
+                            <constraint firstItem="V2Z-DR-6sM" firstAttribute="leading" secondItem="tTl-V3-Jac" secondAttribute="leading" constant="10" id="AIS-yy-Kgc"/>
+                            <constraint firstItem="hUd-2N-kbx" firstAttribute="leading" secondItem="tTl-V3-Jac" secondAttribute="leading" constant="15" id="GKz-Gi-hjf"/>
+                            <constraint firstAttribute="trailing" secondItem="V2Z-DR-6sM" secondAttribute="trailing" constant="10" id="NsJ-tO-qk2"/>
+                            <constraint firstAttribute="trailing" secondItem="tAK-cd-lpi" secondAttribute="trailing" constant="15" id="Yr0-Zv-yM5"/>
+                            <constraint firstItem="tAK-cd-lpi" firstAttribute="top" secondItem="2pO-4W-KWY" secondAttribute="bottom" constant="20" id="hD7-xI-PF8"/>
+                            <constraint firstItem="hUd-2N-kbx" firstAttribute="top" secondItem="tAK-cd-lpi" secondAttribute="bottom" constant="30" id="sca-3G-qec"/>
+                            <constraint firstItem="V2Z-DR-6sM" firstAttribute="top" secondItem="hUd-2N-kbx" secondAttribute="bottom" constant="10" id="yLx-ZN-aUs"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="eyB-Ij-WIK"/>
+                    <connections>
+                        <outlet property="queryButton" destination="tAK-cd-lpi" id="w06-vm-wYC"/>
+                        <outlet property="resultTextView" destination="V2Z-DR-6sM" id="gPw-kD-XKd"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="jkK-CQ-rfc" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-226" y="887"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="18Y-MR-cEJ">
+            <objects>
+                <navigationController storyboardIdentifier="DoubanOnlinesControllerNav" automaticallyAdjustsScrollViewInsets="NO" id="PEG-GD-jbE" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="c5h-rn-2YI">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="nEG-0f-kE0" kind="relationship" relationship="rootViewController" id="Zpu-AP-j0s"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="n6C-aH-XJJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1116" y="887"/>
+        </scene>
     </scenes>
 </document>

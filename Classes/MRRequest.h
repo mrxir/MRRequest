@@ -140,7 +140,6 @@ typedef void(^Failure)(MRRequest *request, id requestObject, NSData *data, NSErr
  */
 + (MROAuthTokenState)analyseOAuthTokenStateAndGenerateReport:(NSDictionary **)report;
 
-
 @end
 
 
@@ -148,6 +147,22 @@ typedef void(^Failure)(MRRequest *request, id requestObject, NSData *data, NSErr
 #pragma mark - OAuthSetting
 
 @interface MRRequest (OAuthSetting)
+
+#pragma mark - OAuth 开关
+
+/**
+ 激活OAuth
+
+ @param error 错误
+ @return 是否激活成功
+ */
++ (BOOL)activeOAuth:(NSError **)error;
+
+
+/**
+ 停用OAuth
+ */
++ (void)deactiveOAuth;
 
 #pragma mark - OAuth 设置oauth服务器
 

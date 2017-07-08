@@ -25,17 +25,6 @@
 
 @end
 
-@interface MRDD : NSObject
-
-@property (nonatomic, copy) NSString *myName;
-@property (nonatomic, copy) NSString *myAge;
-
-@end
-
-@implementation MRDD
-
-@end
-
 @implementation WeatherQueryController
 
 - (void)viewDidAppear:(BOOL)animated

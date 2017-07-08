@@ -58,6 +58,12 @@
 					<key>description</key>
 					<string>天气查询模拟</string>
 				</dict>
+				<dict>
+					<key>identifier</key>
+					<string>DoubanOnlinesController</string>
+					<key>description</key>
+					<string>豆瓣线上活动</string>
+				</dict>
 			</array>
 		</dict>
 	</array>

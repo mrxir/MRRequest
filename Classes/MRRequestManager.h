@@ -36,9 +36,20 @@ typedef NS_ENUM(NSUInteger, MRRequestLogLevel) {
 
 @property (nonatomic, strong, readonly) NSMutableSet *processingRequestIdentifierSet;
 
-@property (nonatomic, assign, getter = isOAuthEnabled) BOOL oAuthEnabled;
+@property (nonatomic, assign, readonly, getter = isOAuthEnabled) BOOL oAuthEnabled;
 
 + (instancetype)defaultManager;
+
+/**
+ 激活OAuth
+ */
+- (BOOL)activeOAuth:(NSError **)error;
+
+
+/**
+ 停用OAuth
+ */
+- (void)deactiveOAuth;
 
 @end
 

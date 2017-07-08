@@ -72,7 +72,7 @@
     } replaceOrKeepBoth:NO];
     
     [MRRequest setHandleBlock:^{
-        [[UIApplication sharedApplication].keyWindow makeToast:@"正在处理上个请求, 请稍候... 😊" duration:3 position:CSToastPositionTop];
+        [[UIApplication sharedApplication].keyWindow makeToast:@"正在处理上个请求, 请稍候... 😊"];
     } forErrorCode:MRRequestErrorCodeEqualRequestError];
     
     [MRRequest setHandleBlock:^{

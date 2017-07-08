@@ -36,6 +36,61 @@
     return _processingRequestIdentifierSet;
 }
 
+- (BOOL)activeOAuth:(NSError *__autoreleasing *)error
+{
+    NSString *server = [MROAuthRequestManager defaultManager].server;
+    NSString *client_id = [MROAuthRequestManager defaultManager].client_id;
+    NSString *client_secret = [MROAuthRequestManager defaultManager].client_secret;
+    NSTimeInterval autodestruct = [MROAuthRequestManager defaultManager].oAuthInfoAutodestructTimeInterval;
+    
+    BOOL shouldActive = NO;
+    
+    if ([NSString isValidString:server]
+        && [NSString isValidString:client_id]
+        && [NSString isValidString:client_secret])
+    {
+        if (client_id.length >= 6
+            && client_secret.length >= 6
+            && autodestruct >= 10)
+        {
+            shouldActive = YES;
+        }
+    }
+    
+    if (shouldActive == NO) {
+        
+        if (error != nil) {
+            
+            *error = [NSError errorWithDomain:MRRequestErrorDomain
+                                         code:666
+                                     userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"OAuth信息设置有误, 请检查 😨", nil),
+                                                @"config": @{@"server": [NSString stringWithFormat:@"%@", server],
+                                                             @"client_id": [NSString stringWithFormat:@"%@", client_id],
+                                                             @"client_secret": [NSString stringWithFormat:@"%@", client_secret],
+                                                             @"autodestruct": @(autodestruct)}}];
+            
+            if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelError) {
+                NSLog(@"[OAUTH] ❗️ %@", *error);
+            }
+            
+        }
+        
+        self.oAuthEnabled = NO;
+        
+    } else {
+        
+        self.oAuthEnabled = YES;
+    }
+    
+    return shouldActive;
+    
+}
+
+- (void)deactiveOAuth
+{
+    self.oAuthEnabled = NO;
+}
+
 - (void)setOAuthEnabled:(BOOL)oAuthEnabled
 {
     if (_oAuthEnabled != oAuthEnabled) {
@@ -45,7 +100,7 @@
         if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelInfo) {
             
             if (_oAuthEnabled == YES) {
-                NSLog(@"[OAUTH] 🔘 OAuth enabled.");
+                NSLog(@"[OAUTH] 🔘🔘🔘 OAuth activated.");
                 
                 [[NSNotificationCenter defaultCenter] addObserver:self
                                                          selector:@selector(didReceiveApplicationDidBecomeActiveNotification:)
@@ -53,7 +108,7 @@
                                                            object:nil];
                 
             } else {
-                NSLog(@"[OAUTH] 🔘 OAuth disabled.");
+                NSLog(@"[OAUTH] 🔘🔘🔘 OAuth deactivated.");
                 
                 [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
             }
@@ -144,7 +199,7 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
     _oAuthStatePeriodicCheckTimeInterval = oAuthStatePeriodicCheckTimeInterval;
     
     if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelDebug) {
-        NSLog(@"[OAUTH] ⚪️ OAuth state periodic check time interval is %.2f", oAuthStatePeriodicCheckTimeInterval);
+        NSLog(@"[OAUTH] ⚪️ OAuth state periodic check time interval is '%.2f'.", oAuthStatePeriodicCheckTimeInterval);
     }
     
     [self.oAuthStatePeriodicCheckTimer setFireDate:[NSDate distantFuture]];
@@ -473,7 +528,7 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
 {
     if (![value isKindOfClass:aClass]) {
         if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelWarning) {
-            NSLog(@"[NSUserDefaults] ⚠️ The object <%@: %p> %@ is not a kind of expected class %@", aClass, value, value, aClass);
+            NSLog(@"[NSUserDefaults] ⚠️ The object <%@: %p> %@ is not a kind of expected class <%@>.", aClass, value, value, aClass);
         }
     }
     
@@ -574,7 +629,7 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
     if (self.isProcessingOAuthAbnormalPresetPlan == YES) return;
     
     if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelInfo) {
-        NSLog(@"[OAUTH] 🔘 Execute framework access_token invalid plan");
+        NSLog(@"[OAUTH] 🔘 Execute framework access_token invalid plan.");
     }
     
     [self frameworkRefreshAccessToken];
@@ -584,7 +639,7 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
 - (void)executeFrameworkPresetPlanForRefreshTokenAbnormal
 {
     if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelDebug) {
-        NSLog(@"[OAUTH] 🔘 Execute framework refresh_token invalid plan");
+        NSLog(@"[OAUTH] 🔘 Execute framework refresh_token invalid plan.");
     }
     
     [MROAuthRequestManager cleanUserDefaults];
@@ -596,7 +651,7 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
 - (void)executeCustomPresetPlanForAccessTokenAbnormal
 {
     if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
-        NSLog(@"[OAUTH] 🔘 Execute custom access_token invalid plan");
+        NSLog(@"[OAUTH] 🔘 Execute custom access_token invalid plan.");
     }
     
     if (self.oAuthAccessTokenAbnormalCustomPlanBlock != nil) {
@@ -607,7 +662,7 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
 - (void)executeCustomPresetPlanForRefreshTokenAbnormal
 {
     if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
-        NSLog(@"[OAUTH] 🔘 Execute custom refresh_token invalid plan");
+        NSLog(@"[OAUTH] 🔘 Execute custom refresh_token invalid plan.");
     }
     
     if (self.oAuthRefreshTokenAbnormalCustomPlanBlock != nil) {
