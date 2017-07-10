@@ -15,4 +15,6 @@
 
 #import "UIStoryboard+Extension.h"
 
+#import "UIApplication+Extension.h"
+
 #endif /* MRUIKit_h */

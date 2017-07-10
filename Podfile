@@ -9,12 +9,12 @@ target 'MRRequest' do
 
   # Pods for MRRequest
   
-  pod 'SVProgressHUD', '~> 2.1.2'
+  pod 'SVProgressHUD'
   
-  pod 'MRFramework', '~> 1.0.1'
+  pod 'MRFramework'
   
-  pod 'IQKeyboardManager', '~> 4.0.10'
+  pod 'IQKeyboardManager'
   
-  pod 'Toast', '~> 3.1.0'
+  pod 'Toast'
 
 end
