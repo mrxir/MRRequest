@@ -12,7 +12,7 @@ target 'MRRequest' do
   pod 'SVProgressHUD'
   
   pod 'MRFramework'
-  
+
   pod 'IQKeyboardManager'
   
   pod 'Toast'
