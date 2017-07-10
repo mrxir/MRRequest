@@ -151,7 +151,6 @@
 		606D0E113CBECDEF86E6FA10C3506FB5 /* IQNSArray+Sort.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "IQNSArray+Sort.m"; path = "IQKeyboardManager/Categories/IQNSArray+Sort.m"; sourceTree = "<group>"; };
 		61E4130ECE7ABD54EA4F9A7A04C402F6 /* SVProgressHUD.bundle */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "wrapper.plug-in"; name = SVProgressHUD.bundle; path = SVProgressHUD/SVProgressHUD.bundle; sourceTree = "<group>"; };
 		630B53216AF5BC23315A0566BFDAD364 /* NSDictionary+Extension.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSDictionary+Extension.h"; path = "Classes/Foundation-Extension/NSDictionary+Extension.h"; sourceTree = "<group>"; };
-		6775768F1F1369F700715F6B /* MRRequest.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = MRRequest.podspec; sourceTree = "<group>"; };
 		683B41169AE64D772D70EC5467CD6094 /* UIControl+Extension.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIControl+Extension.h"; path = "Classes/UIKit-Extension/UIControl+Extension.h"; sourceTree = "<group>"; };
 		6849CB72EB30C4B56678207782D47037 /* IQKeyboardManager.bundle */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "wrapper.plug-in"; name = IQKeyboardManager.bundle; path = IQKeyboardManager/Resources/IQKeyboardManager.bundle; sourceTree = "<group>"; };
 		68A60BE822E45AB7B4C2D8E64ABF4913 /* Pods-MRRequest-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-MRRequest-acknowledgements.markdown"; sourceTree = "<group>"; };
@@ -358,7 +357,6 @@
 		7DB346D0F39D3F0E887471402A8071AB = {
 			isa = PBXGroup;
 			children = (
-				6775768F1F1369F700715F6B /* MRRequest.podspec */,
 				93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */,
 				14B8B9B15ECBE87983FF987239AB2D7B /* Frameworks */,
 				BD1FBBC70DACBD76830C0DDC0E392E0D /* Pods */,
