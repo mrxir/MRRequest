@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "MRRequest"
-  s.version      = "1.0.0"
+  s.version      = "MSDN"
   s.summary      = "A simple network request class and it's easy to use."
 
   # This description is used to generate tags and improve search results.
