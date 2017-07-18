@@ -98,6 +98,15 @@
 
 #pragma mark - private tool method
 
+- (NSString *)encryptWithSHA1:(NSString *)sha1Source
+{
+    sha1Source = [sha1Source stringByAppendingString:@"SHA"];
+    
+    sha1Source = sha1Source.md5Hash;
+    
+    return sha1Source;
+}
+
 - (id)constructResultWithSource:(id)source dynamicParameter:(id *)dynamicParameter
 {
     
@@ -200,6 +209,10 @@
             
             NSString *sign = oAuthDynamicParameter[@"sign"];
             if (![NSString isValidString:sign]) sign = notEmptyKeyValueMap.formattedIntoFormStyleString.md5Hash;
+            
+            // SHA 加密
+            sign = [self encryptWithSHA1:sign];
+            
             oAuthDynamicParameter[@"sign"] = sign;
             
             if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
