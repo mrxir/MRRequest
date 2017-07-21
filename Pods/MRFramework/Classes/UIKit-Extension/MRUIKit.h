@@ -17,4 +17,8 @@
 
 #import "UIApplication+Extension.h"
 
+#import "UIImage+Extension.h"
+
+#import "UINavigationBar+Extension.h"
+
 #endif /* MRUIKit_h */

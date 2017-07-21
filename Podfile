@@ -9,10 +9,10 @@ target 'MRRequest' do
 
   # Pods for MRRequest
   
+  pod 'MRFramework', :git => 'https://github.com/mrxir/MRFramework.git'
+
   pod 'SVProgressHUD'
   
-  pod 'MRFramework'
-
   pod 'IQKeyboardManager'
   
   pod 'Toast'
