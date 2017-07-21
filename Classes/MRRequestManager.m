@@ -510,18 +510,7 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
 
 + (void)cleanUserDefaults
 {
-//    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelInfo) {
-//        NSLog(@"[OAUTH] 🔘 Userdefaults is cleaned.");
-//    }
-//    
-//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"client_id"];
-//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"client_secret"];
-//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"oAuthResultInfo"];
-//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"access_token"];
-//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"refresh_token"];
-//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"access_token_storage_date"];
-//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"refresh_token_storage_date"];
-//    [[NSUserDefaults standardUserDefaults] synchronize];
+    
 }
 
 + (void)setValue:(id)value class:(Class)aClass forKey:(NSString *)key

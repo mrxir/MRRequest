@@ -43,6 +43,12 @@
     [CSToastManager setQueueEnabled:NO];
     [CSToastManager setDefaultPosition:CSToastPositionBottom];
 
+    [MRRequest setCustomAdditionalParameter:@{@"appBundleIdentifier": @"com.taigesiit.test",
+                                              @"appVersion"         : @"1.0.0",
+                                              @"deviceSystemVersion": @"8.0",
+                                              @"deviceSerialNumber" : @"0000-0000-0000-0000",
+                                              @"deviceModel"        : @"iPhone X",
+                                              @"devicePlatform"     : @"iOS"}];
 
     [MRRequest setLogLevel:MRRequestLogLevelVerbose];
     

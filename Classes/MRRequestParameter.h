@@ -30,12 +30,13 @@ typedef NS_ENUM(NSUInteger, MRRequestParameterOAuthRequestScope) {
 /**
  网络请求方式
 
- - MRRequestParameterRequestMethodGet: GET 请求
  - MRRequestParameterRequestMethodPost: POST 请求
+ - MRRequestParameterRequestMethodGet: GET 请求
+ 
  */
 typedef NS_ENUM(NSUInteger, MRRequestParameterRequestMethod) {
-    MRRequestParameterRequestMethodGet,
     MRRequestParameterRequestMethodPost,
+    MRRequestParameterRequestMethodGet,
 };
 
 
@@ -45,12 +46,13 @@ typedef NS_ENUM(NSUInteger, MRRequestParameterRequestMethod) {
 /**
  参数格式化样式
 
- - MRRequestParameterFormattedStyleJSON: 标准的JSON样式, 像 {"key1":"value1","key2":"value2"}
  - MRRequestParameterFormattedStyleForm: 常用的Form表单样式, 像 {key1=value1&key2=value2}
+ - MRRequestParameterFormattedStyleJSON: 标准的JSON样式, 像 {"key1":"value1","key2":"value2"}
+ 
  */
 typedef NS_ENUM(NSUInteger, MRRequestParameterFormattedStyle) {
-    MRRequestParameterFormattedStyleJSON,
     MRRequestParameterFormattedStyleForm,
+    MRRequestParameterFormattedStyleJSON,
 };
 
 @interface MRRequestParameter : NSObject

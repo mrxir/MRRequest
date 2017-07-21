@@ -215,15 +215,7 @@
             
             oAuthDynamicParameter[@"sign"] = sign;
             
-            if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
-                NSLog(@"[OAUTH] ▫️ DynamicParameter <%@: %p> %@", oAuthDynamicParameter.superclass, oAuthDynamicParameter, oAuthDynamicParameter);
-            }
-            
             validJSONObjectOrString = oAuthDynamicParameter;
-            
-            if (dynamicParameter != nil) {
-                *dynamicParameter = validJSONObjectOrString;
-            }
             
         }
         
@@ -231,6 +223,32 @@
     
     // 若此时 validJSONObjectOrString 为空, 则直接返回 nil.
     if (validJSONObjectOrString == nil) return nil;
+    
+    // 如果 validJSONObjectOrString 可以追加参数， 那么如果有自定义附加参数就往内部追加。
+    
+    if ([validJSONObjectOrString isKindOfClass:[NSDictionary class]]) {
+        
+        NSDictionary *customAdditionalParameter = [MRRequestManager defaultManager].customAdditionalParameter;
+        
+        if ([customAdditionalParameter isKindOfClass:[NSDictionary class]]) {
+            
+            validJSONObjectOrString = [NSMutableDictionary dictionaryWithDictionary:validJSONObjectOrString];
+            [validJSONObjectOrString setValuesForKeysWithDictionary:customAdditionalParameter];
+            
+        }
+        
+    }
+    
+    if (dynamicParameter != nil) {
+        
+        *dynamicParameter = validJSONObjectOrString;
+        
+        if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
+            NSLog(@"[OAUTH] ▫️ DynamicParameter <%@: %p> %@", [validJSONObjectOrString superclass], validJSONObjectOrString, validJSONObjectOrString);
+        }
+        
+    }
+    
     
     // 参数格式化
     NSString *parameterFormattedString = nil;

@@ -32,6 +32,8 @@ typedef NS_ENUM(NSUInteger, MRRequestLogLevel) {
 
 @interface MRRequestManager : NSObject
 
+@property (nonatomic, strong) NSDictionary *customAdditionalParameter;
+
 @property (nonatomic, assign) MRRequestLogLevel logLevel;
 
 @property (nonatomic, strong, readonly) NSMutableSet *processingRequestIdentifierSet;

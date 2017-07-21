@@ -81,6 +81,8 @@
     // insert map
     self.loginInfo[@"username"]         = self.username.text;
     self.loginInfo[@"password"]         = self.password.text;
+    self.loginInfo[@"login_type"]       = @"0",
+    self.loginInfo[@"client_type"]      = @"iOS";
     
 }
 
@@ -95,7 +97,7 @@
     parameter.oAuthIndependentSwitchState = YES;
     parameter.oAuthRequestScope = MRRequestParameterOAuthRequestScopeRequestAccessToken;
     parameter.requestMethod = MRRequestParameterRequestMethodPost;
-    parameter.formattedStyle = MRRequestParameterFormattedStyleForm;
+    parameter.formattedStyle = MRRequestParameterFormattedStyleForm;    
     
     [SVProgressHUD showWithStatus:@"正在登录"];
     

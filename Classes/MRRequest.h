@@ -94,6 +94,14 @@ typedef void(^Failure)(MRRequest *request, id requestObject, NSData *data, NSErr
 + (dispatch_block_t)handleBlockForErrorCode:(MRRequestErrorCode)code;
 
 /**
+ 设置自定义附加参数
+
+ @param parameter 附加参数
+ */
++ (void)setCustomAdditionalParameter:(NSDictionary *)parameter;
++ (NSDictionary *)customAdditionalParameter;
+
+/**
  当前MRRequest错误
 
  @return 当前被抛出的MRRequest错误

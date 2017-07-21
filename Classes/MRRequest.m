@@ -716,6 +716,16 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     return [[MRRequestErrorHandler defaultManager] currentError];
 }
 
++ (void)setCustomAdditionalParameter:(NSDictionary *)parameter
+{
+    [MRRequestManager defaultManager].customAdditionalParameter = parameter;
+}
+
++ (NSDictionary *)customAdditionalParameter
+{
+    return [MRRequestManager defaultManager].customAdditionalParameter;
+}
+
 @end
 
 
