@@ -48,7 +48,7 @@
                                               @"deviceSystemVersion": @"8.0",
                                               @"deviceSerialNumber" : @"0000-0000-0000-0000",
                                               @"deviceModel"        : @"iPhone X",
-                                              @"devicePlatform"     : @"iOS"}];
+                                              @"devicePlatform"     : @"1"}];
 
     [MRRequest setLogLevel:MRRequestLogLevelVerbose];
     

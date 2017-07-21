@@ -82,7 +82,7 @@
     self.loginInfo[@"username"]         = self.username.text;
     self.loginInfo[@"password"]         = self.password.text;
     self.loginInfo[@"login_type"]       = @"0",
-    self.loginInfo[@"client_type"]      = @"iOS";
+    self.loginInfo[@"client_type"]      = @"1";
     
 }
 
