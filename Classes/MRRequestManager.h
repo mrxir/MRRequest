@@ -32,6 +32,9 @@ typedef NS_ENUM(NSUInteger, MRRequestLogLevel) {
 
 @interface MRRequestManager : NSObject
 
+/** 这个应用程序曾经变得消沉过(有过切换到不活跃状态的记录) */
+@property (nonatomic, assign, readonly, getter = isThisApplicationHadEverBeenDepressed) BOOL thisApplicationHadEverBeenDepressed;
+
 @property (nonatomic, strong) NSDictionary *customAdditionalParameter;
 
 @property (nonatomic, assign) MRRequestLogLevel logLevel;

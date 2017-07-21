@@ -103,8 +103,8 @@
                 NSLog(@"[OAUTH] 🔘🔘🔘 OAuth activated.");
                 
                 [[NSNotificationCenter defaultCenter] addObserver:self
-                                                         selector:@selector(didReceiveApplicationDidBecomeActiveNotification:)
-                                                             name:UIApplicationDidBecomeActiveNotification
+                                                         selector:@selector(didReceiveApplicationWillResignActiveNotification:)
+                                                             name:UIApplicationWillResignActiveNotification
                                                            object:nil];
                 
             } else {
@@ -122,6 +122,25 @@
         
     }
    
+}
+
+- (void)didReceiveApplicationWillResignActiveNotification:(NSNotification *)notification
+{
+    if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
+        NSLog(@"[OAUTH] ▫️ %s", __FUNCTION__);
+    }
+    
+    if (self.isThisApplicationHadEverBeenDepressed == NO) {
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(didReceiveApplicationDidBecomeActiveNotification:)
+                                                     name:UIApplicationDidBecomeActiveNotification
+                                                   object:nil];
+        
+        _thisApplicationHadEverBeenDepressed = YES;
+        
+    }
+    
 }
 
 - (void)didReceiveApplicationDidBecomeActiveNotification:(NSNotification *)notification
