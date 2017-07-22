@@ -58,7 +58,7 @@
     
     CC_MD5_Init(&md5HashContext);
     
-    CC_MD5_Update(&md5HashContext, input, (CC_LONG) [self length]);
+    CC_MD5_Update(&md5HashContext, input, (CC_LONG) strlen(input));
     
     unsigned char digest[CC_MD5_DIGEST_LENGTH];
     

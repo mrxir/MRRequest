@@ -6,9 +6,18 @@ PODS:
 
 DEPENDENCIES:
   - IQKeyboardManager
-  - MRFramework
+  - MRFramework (from `https://github.com/mrxir/MRFramework.git`)
   - SVProgressHUD
   - Toast
+
+EXTERNAL SOURCES:
+  MRFramework:
+    :git: https://github.com/mrxir/MRFramework.git
+
+CHECKOUT OPTIONS:
+  MRFramework:
+    :commit: 07fc287181cf237e4b6149dcabc2d778b0012eb4
+    :git: https://github.com/mrxir/MRFramework.git
 
 SPEC CHECKSUMS:
   IQKeyboardManager: 593ee99b88381f4b9ccb22bd680f22606351bd41
@@ -16,6 +25,6 @@ SPEC CHECKSUMS:
   SVProgressHUD: c404a55d78acbeb7ebb78b76d3faf986475a6994
   Toast: 14a93686d6c8bfe2727afd342414e35660a8a1f3
 
-PODFILE CHECKSUM: fa9da1dfe2cf176fad32af99a2d7b2ff00cd0073
+PODFILE CHECKSUM: 33a126c84f35fb3edf288cf027e3b02fd9678b0f
 
 COCOAPODS: 1.2.1
