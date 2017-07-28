@@ -106,7 +106,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
                 NSLog(@"[MRREQUEST] ❗️ parameter %@", parameter.object);
                 NSLog(@"[MRREQUEST] ❗️ URL \"%@\".", path);
                 NSLog(@"[MRREQUEST] ❗️ EncodedURL \"%@\".", url.absoluteString);
-
+                
             }
             
         }
@@ -222,12 +222,15 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
             // 访问和刷新令牌都失效
             if (tokenState == MROAuthTokenStateBothInvalid) {
                 
+                NSString *errorDesc = @"OAuth业务请求发起前检测到严重错误, 因为访问和续约令牌都已失效.";
                 NSError *error = [NSError errorWithDomain:MRRequestErrorDomain
                                                      code:MRRequestErrorCodeOAuthCommonRequestHeavilyError
-                                                 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"OAuth业务请求发起前检测到严重错误, 因为访问和续约令牌都已失效.", nil)}];
+                                                 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(errorDesc, nil)}];
                 
                 if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelError) {
-                    NSLog(@"[MRREQUEST] ❗️ %@", error);
+                    NSLog(@"[MRREQUEST] ❗️ 地址 %@", self.URL);
+                    NSLog(@"[MRREQUEST] ❗️ 参数 %@", self.parameter.object);
+                    NSLog(@"[MRREQUEST] ❗️ 错误 %@", errorDesc);
                 }
                 
                 self.anyError = error;
@@ -239,7 +242,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
             }
             
             
-        // 续约令牌请求时当续约令牌失效时抛出错误
+            // 续约令牌请求时当续约令牌失效时抛出错误
         } else if (self.parameter.oAuthRequestScope == MRRequestParameterOAuthRequestScopeRefreshAccessToken) {
             
             // 判断令牌状态
@@ -248,12 +251,15 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
             // 刷新令牌失效
             if (tokenState == MROAuthTokenStateOnlyAccessTokenAvailable) {
                 
+                NSString *errorDesc = @"OAuth续约请求发起前检测到严重错误, 因为续约令牌已失效.";
                 NSError *error = [NSError errorWithDomain:MRRequestErrorDomain
                                                      code:MRRequestErrorCodeOAuthRenewalError
-                                                 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"OAuth续约请求发起前检测到严重错误, 因为续约令牌已失效.", nil)}];
+                                                 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(errorDesc, nil)}];
                 
                 if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelError) {
-                    NSLog(@"[MRREQUEST] ❗️ %@", error);
+                    NSLog(@"[MRREQUEST] ❗️ 地址 %@", self.URL);
+                    NSLog(@"[MRREQUEST] ❗️ 参数 %@", self.parameter.object);
+                    NSLog(@"[MRREQUEST] ❗️ 错误 %@", errorDesc);
                 }
                 
                 self.anyError = error;
@@ -289,12 +295,15 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
         
         if ([[MRRequestManager defaultManager].processingRequestIdentifierSet containsObject:self.requestIdentifier]) {
             
+            NSString *errorDesc = @"MRRequest队列中存在完全相同的请求, 此次请求无法发起失败.";
             NSError *error = [NSError errorWithDomain:MRRequestErrorDomain
                                                  code:MRRequestErrorCodeEqualRequestError
-                                             userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"MRRequest队列中存在完全相同的请求, 此次请求无法发起失败.", nil)}];
+                                             userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(errorDesc, nil)}];
             
             if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelError) {
-                NSLog(@"[MRREQUEST] ❗️ %@", error);
+                NSLog(@"[MRREQUEST] ❗️ 地址 %@", self.URL);
+                NSLog(@"[MRREQUEST] ❗️ 参数 %@", self.parameter.object);
+                NSLog(@"[MRREQUEST] ❗️ 错误 %@", errorDesc);
             }
             
             self.anyError = error;
@@ -382,7 +391,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     
     // delegate success
     
-
+    
 }
 
 - (void)dealloc
@@ -467,16 +476,20 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
         }
         
     }
-
+    
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
+    [self.receiveData appendData:data];
+    
     if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelVerbose) {
-        NSLog(@"[MRREQUEST] ▫️ %s", __FUNCTION__);
+        NSLog(@"[MRREQUEST] ▫️ %s + LENGTH %06d = LENGTH %06d",
+              __FUNCTION__,
+              (unsigned)data.length,
+              (unsigned)self.receiveData.length);
     }
     
-    [self.receiveData appendData:data];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
@@ -575,11 +588,11 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
                 if ([MRRequest isOAuthStateAfterOrdinaryBusinessRequestCheckEnabled] == YES) {
                     [[MROAuthRequestManager defaultManager] analyseOAuthTokenStateAndGenerateReport:nil];
                 }
-                                
+                
             }
             
         }
-
+        
         
     }
     
@@ -617,6 +630,10 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
         
         oAuthErrorCode = exception[@"error"];
         oAuthErrorDesc = exception[@"error_description"];
+        
+        if (!oAuthErrorDesc) {
+            oAuthErrorDesc = exception[@"localizedMessage"];
+        }
         
     } else {
         
@@ -683,6 +700,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
         }
         
         NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+        userInfo[NSURLPathKey] = self.URL;
         userInfo[NSLocalizedDescriptionKey] = NSLocalizedString(requestErrorDesc, nil);
         userInfo[NSLocalizedFailureReasonErrorKey] = NSLocalizedString(oAuthErrorCodeDesc, nil);
         userInfo[NSURLLocalizedLabelKey] = receiveDictionary;
@@ -692,7 +710,11 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
                                  userInfo:userInfo];
         
         if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelError) {
-            NSLog(@"[OAUTH] ❗️ %@", *error);
+            
+            NSLog(@"[MRREQUEST] ❗️ 地址 %@", self.URL);
+            NSLog(@"[MRREQUEST] ❗️ 参数 %@", self.parameter.object);
+            NSLog(@"[MRREQUEST] ❗️ 错误 %@", oAuthErrorCodeDesc);
+            
         }
         
         return NO;
@@ -775,12 +797,12 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     [MROAuthRequestManager defaultManager].oAuthInfoAutodestructTimeInterval = autodestructTimeInterval;
     
     return [[MRRequestManager defaultManager] activeOAuth:error];
-
+    
     
     
     
     BOOL shouldEnabled = NO;
-
+    
     if ([NSString isValidString:server] && [NSString isValidString:clientId] && [NSString isValidString:clientSecret]) {
         if (clientId.length >= 6 && clientSecret.length >= 6 && autodestructTimeInterval >= 10) {
             shouldEnabled = YES;
@@ -796,21 +818,23 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
         
         if (error != nil) {
             
+            NSString *errorDesc = @"OAuth信息设置有误, 请检查 😨";
+            
             *error = [NSError errorWithDomain:MRRequestErrorDomain
                                          code:666
-                                     userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"OAuth信息设置有误, 请检查 😨", nil),
+                                     userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(errorDesc, nil),
                                                 @"oauth": @{@"server": [NSString stringWithFormat:@"%@", server],
                                                             @"client_id": [NSString stringWithFormat:@"%@", clientId],
                                                             @"client_secret": [NSString stringWithFormat:@"%@", clientSecret],
                                                             @"autodestructTimeInterval": @(autodestructTimeInterval)}}];
             
             if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelError) {
-                NSLog(@"[OAUTH] ❗️ %@", *error);
+                NSLog(@"[OAUTH] ❗️ %@", errorDesc);
             }
             
             
         }
-
+        
         
     }
     
@@ -998,7 +1022,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
             NSLog(@"[OAUTH] ❗️ OAuth未开启, 无法设置 OAuthAccessTokenAbnormalCustomPlanBlock 😨");
         }
     }
-   
+    
 }
 
 + (void)setOAuthRefreshTokenAbnormalCustomPlanBlock:(dispatch_block_t)planBlock replaceOrKeepBoth:(BOOL)replaceOrKeepBoth;

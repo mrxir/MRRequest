@@ -72,7 +72,7 @@
 
 - (void)didClickFillItem:(UIBarButtonItem *)item
 {
-    self.username.text = @"abc123";
+    self.username.text = @"15201118210";
     self.password.text = @"123456";
 }
 

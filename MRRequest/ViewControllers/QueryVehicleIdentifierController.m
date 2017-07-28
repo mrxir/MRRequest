@@ -79,16 +79,16 @@
 {
     [self updateMapAndUI];
     
-    NSString *path = @"http://10.0.40.119:8080/api/test?";
+    NSString *path = @"https://test-appif.chejianding.com:10000/api/home/homeIndex?";
     
-    MRRequestParameter *parameter = [[MRRequestParameter alloc] initWithObject:self.queryInfo];
+    MRRequestParameter *parameter = [[MRRequestParameter alloc] initWithObject:nil];
     
     parameter.oAuthIndependentSwitchState = YES;
     parameter.oAuthRequestScope = MRRequestParameterOAuthRequestScopeOrdinaryBusiness;
     parameter.formattedStyle = MRRequestParameterFormattedStyleForm;
     parameter.requestMethod = MRRequestParameterRequestMethodPost;
     
-    [SVProgressHUD showWithStatus:@"VIN查询中..."];
+    [SVProgressHUD showWithStatus:@"查询中..."];
     
     [MRRequest requestWithPath:path parameter:parameter success:^(MRRequest *request, id receiveObject) {
         
@@ -97,6 +97,8 @@
         self.resultTextView.text = [NSString stringWithFormat:@"%@", [receiveObject stringWithUTF8]];
         
     } failure:^(MRRequest *request, id requestObject, NSData *data, NSError *error) {
+        
+        NSLog(@"%@", data.stringWithUTF8);
         
         self.resultTextView.text = error.description;
         
