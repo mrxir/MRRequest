@@ -213,18 +213,18 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     
     if (oAuthEnabled == YES) {
         
-        // 判断令牌状态
-        MROAuthTokenState tokenState = [[MROAuthRequestManager defaultManager] analyseOAuthTokenStateAndGenerateReport:nil];
-        
-        // 请求范围
+        // 普通业务请求时当两个令牌失效时抛出错误
         if (self.parameter.oAuthRequestScope == MRRequestParameterOAuthRequestScopeOrdinaryBusiness) {
+            
+            // 判断令牌状态
+            MROAuthTokenState tokenState = [[MROAuthRequestManager defaultManager] analyseOAuthTokenStateAndGenerateReport:nil];
             
             // 访问和刷新令牌都失效
             if (tokenState == MROAuthTokenStateBothInvalid) {
                 
                 NSError *error = [NSError errorWithDomain:MRRequestErrorDomain
                                                      code:MRRequestErrorCodeOAuthCommonRequestHeavilyError
-                                                 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"OAuth请求时发生严重错误, 访问和续约令牌都已失效.", nil)}];
+                                                 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"OAuth业务请求发起前检测到严重错误, 因为访问和续约令牌都已失效.", nil)}];
                 
                 if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelError) {
                     NSLog(@"[MRREQUEST] ❗️ %@", error);
@@ -237,6 +237,33 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
                 return;
                 
             }
+            
+            
+        // 续约令牌请求时当续约令牌失效时抛出错误
+        } else if (self.parameter.oAuthRequestScope == MRRequestParameterOAuthRequestScopeRefreshAccessToken) {
+            
+            // 判断令牌状态
+            MROAuthTokenState tokenState = [[MROAuthRequestManager defaultManager] analyseOAuthTokenStateAndGenerateReport:nil];
+            
+            // 刷新令牌失效
+            if (tokenState == MROAuthTokenStateOnlyAccessTokenAvailable) {
+                
+                NSError *error = [NSError errorWithDomain:MRRequestErrorDomain
+                                                     code:MRRequestErrorCodeOAuthRenewalError
+                                                 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"OAuth续约请求发起前检测到严重错误, 因为续约令牌已失效.", nil)}];
+                
+                if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelError) {
+                    NSLog(@"[MRREQUEST] ❗️ %@", error);
+                }
+                
+                self.anyError = error;
+                
+                [self failed];
+                
+                return;
+                
+            }
+            
             
         }
         
@@ -264,7 +291,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
             
             NSError *error = [NSError errorWithDomain:MRRequestErrorDomain
                                                  code:MRRequestErrorCodeEqualRequestError
-                                             userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"正在处理上次请求 😨", nil)}];
+                                             userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"MRRequest队列中存在完全相同的请求, 此次请求无法发起失败.", nil)}];
             
             if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelError) {
                 NSLog(@"[MRREQUEST] ❗️ %@", error);
@@ -586,7 +613,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
     
     NSDictionary *exception = receiveDictionary[@"exception"];
     
-    if (exception != nil && [exception isKindOfClass:[NSDictionary class]]) {
+    if ([exception isKindOfClass:[NSDictionary class]]) {
         
         oAuthErrorCode = exception[@"error"];
         oAuthErrorDesc = exception[@"error_description"];
@@ -615,12 +642,12 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
         if (self.parameter.oAuthRequestScope == MRRequestParameterOAuthRequestScopeRequestAccessToken) {
             
             requestErrorCode = MRRequestErrorCodeOAuthRequestError;
-            requestErrorDesc = [NSString stringWithFormat:@"OAuth授权获取时发生错误, %@", oAuthErrorCodeDesc];
+            requestErrorDesc = [NSString stringWithFormat:@"OAuth获取授权的结果中捕获到异常, %@", oAuthErrorCodeDesc];
             
         } else if (self.parameter.oAuthRequestScope == MRRequestParameterOAuthRequestScopeRefreshAccessToken) {
             
             requestErrorCode = MRRequestErrorCodeOAuthRenewalError;
-            requestErrorDesc = [NSString stringWithFormat:@"OAuth授权续约时发生错误, %@", oAuthErrorCodeDesc];
+            requestErrorDesc = [NSString stringWithFormat:@"OAuth续约授权的结果中捕获到异常, %@", oAuthErrorCodeDesc];
             
         } else if (self.parameter.oAuthRequestScope == MRRequestParameterOAuthRequestScopeOrdinaryBusiness) {
             
@@ -636,7 +663,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
             {
                 
                 requestErrorCode = MRRequestErrorCodeOAuthCommonRequestLightlyError;
-                requestErrorDesc = [NSString stringWithFormat:@"OAuth普通请求时发生轻微错误, %@", oAuthErrorCodeDesc];
+                requestErrorDesc = [NSString stringWithFormat:@"OAuth业务请求时捕获到轻微异常, %@", oAuthErrorCodeDesc];
                 
             }
             
@@ -649,16 +676,20 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
             {
                 
                 requestErrorCode = MRRequestErrorCodeOAuthCommonRequestHeavilyError;
-                requestErrorDesc = [NSString stringWithFormat:@"OAuth普通请求时发生严重错误, %@", oAuthErrorCodeDesc];
+                requestErrorDesc = [NSString stringWithFormat:@"OAuth业务请求时捕获到严重异常, %@", oAuthErrorCodeDesc];
                 
             }
             
         }
         
+        NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+        userInfo[NSLocalizedDescriptionKey] = NSLocalizedString(requestErrorDesc, nil);
+        userInfo[NSLocalizedFailureReasonErrorKey] = NSLocalizedString(oAuthErrorCodeDesc, nil);
+        userInfo[NSURLLocalizedLabelKey] = receiveDictionary;
+        
         *error = [NSError errorWithDomain:MRRequestErrorDomain
                                      code:requestErrorCode
-                                 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(requestErrorDesc, nil),
-                                            NSLocalizedFailureReasonErrorKey: NSLocalizedString(oAuthErrorCodeDesc, nil)}];
+                                 userInfo:userInfo];
         
         if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelError) {
             NSLog(@"[OAUTH] ❗️ %@", *error);

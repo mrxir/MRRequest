@@ -53,7 +53,7 @@
     [MRRequest setLogLevel:MRRequestLogLevelVerbose];
     
     NSError *error = nil;
-    [MRRequest enableOAuthRequestWithServer:@"http://10.0.40.119:8080/oauth/token?"
+    [MRRequest enableOAuthRequestWithServer:@"https://test-appif.chejianding.com:10000/oauth/token?"
                                    clientId:@"ff2ff059d245ae8cb378ab54a92e966d"
                                clientSecret:@"01f32ac28d7b45e08932f11a958f1d9f"
                    autodestructTimeInterval:300.0f
