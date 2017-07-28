@@ -225,6 +225,7 @@
     if (validJSONObjectOrString == nil) return nil;
     
     // 如果 validJSONObjectOrString 可以追加参数， 那么如果有自定义附加参数就往内部追加。
+    // 追加默认参数之后, 需要重新执行sign处理: 去空值的键值对; 移除旧的签名键值对;
     
     if ([validJSONObjectOrString isKindOfClass:[NSDictionary class]]) {
         
@@ -234,6 +235,24 @@
             
             validJSONObjectOrString = [NSMutableDictionary dictionaryWithDictionary:validJSONObjectOrString];
             [validJSONObjectOrString setValuesForKeysWithDictionary:customAdditionalParameter];
+            
+            // 使用非空的键值对进行签名
+            NSMutableDictionary *notEmptyKeyValueMap = [NSMutableDictionary dictionaryWithDictionary:validJSONObjectOrString];
+            [notEmptyKeyValueMap enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+                if ([obj respondsToSelector:@selector(length)]) {
+                    if ([obj performSelector:@selector(length)] == 0) {
+                        [notEmptyKeyValueMap removeObjectForKey:key];
+                    }
+                }
+            }];
+            
+            // 如果有默认参数，则加入默认参数后重新加签
+            [notEmptyKeyValueMap removeObjectForKey:@"sign"];
+            
+            // SHA 加密
+            NSString *sign = notEmptyKeyValueMap.formattedIntoFormStyleString.md5Hash;
+            
+            validJSONObjectOrString[@"sign"] = [self encryptWithSHA1:sign];
             
         }
         
@@ -277,9 +296,9 @@
         } else {
             
             parameterFormattedString = [NSJSONSerialization stringWithJSONObject:validJSONObjectOrString options:0 error:nil];
-
+            
             relativelyStableValidJSONObjectOrStringFormattedstring = [NSJSONSerialization stringWithJSONObject:relativelyStableValidJSONObjectOrString options:0 error:nil];
-
+            
         }
         
         if (!parameterFormattedString) {
