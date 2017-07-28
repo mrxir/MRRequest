@@ -121,7 +121,7 @@
         
         
     }
-   
+    
 }
 
 - (void)didReceiveApplicationWillResignActiveNotification:(NSNotification *)notification
@@ -332,11 +332,11 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
         self.access_token_storage_date = date;
         self.refresh_token_storage_date = date;
         
-    // 刷新 access_token
+        // 刷新 access_token
     } else if (scope == MRRequestParameterOAuthRequestScopeRefreshAccessToken) {
         
         NSDate *date = [NSDate date];
-
+        
         self.oAuthResultInfo = dictionary;
         
         self.access_token = dictionary[@"access_token"];
@@ -436,7 +436,7 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
                                            @"refresh_token_durability_timeInterval": @(refresh_token_durability_timeInterval),
                                            @"refresh_token_used_timeInterval": @(refresh_token_used_timeInterval),
                                            @"refresh_token_usable_timeInterval": @(refresh_token_usable_timeInterval)};
-
+        
         analysisInfo[@"oAuthResultInfo"] = oAuthResultInfo;
         analysisInfo[@"oAuthReportAccessTokenInfo"] = accessTokenInfo;
         analysisInfo[@"oAuthReportRefreshTokenInfo"] = refreshTokenInfo;
@@ -503,7 +503,7 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
                 [self executeCustomPresetPlanForRefreshTokenAbnormal];
             }
             
-        // 执行框架和自定义
+            // 执行框架和自定义
         } else {
             
             // 访问令牌失效
@@ -514,6 +514,7 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
             
             // 两者失效
             if (tokenState == MROAuthTokenStateBothInvalid) {
+                [self freezeOAuthStatePeriodicCheckTimer];
                 [self executeFrameworkPresetPlanForRefreshTokenAbnormal];
                 [self executeCustomPresetPlanForRefreshTokenAbnormal];
             }
@@ -559,7 +560,7 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
 + (id)valueForKey:(NSString *)key class:(Class)aClass
 {
     id value = [[NSUserDefaults standardUserDefaults] valueForKey:key];
-        
+    
     if (value == nil && aClass == [NSString class]) value = @"";
     if (value == nil && aClass == [NSDictionary class]) value = @{};
     if (value == nil && aClass == [NSDate class]) value = [NSDate distantPast];
@@ -627,7 +628,7 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
         }
         
     }];
-
+    
 }
 
 #pragma mark - framework preset method
@@ -651,9 +652,6 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
     }
     
     [MROAuthRequestManager cleanUserDefaults];
-    
-    [self freezeOAuthStatePeriodicCheckTimer];
-    
 }
 
 - (void)executeCustomPresetPlanForAccessTokenAbnormal
