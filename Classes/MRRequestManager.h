@@ -157,4 +157,7 @@ typedef NS_ENUM(NSUInteger, MROAuthTokenState) {
 - (void)executeCustomPresetPlanForAccessTokenAbnormal;
 - (void)executeCustomPresetPlanForRefreshTokenAbnormal;
 
+- (void)cleanOAuthUserDefaults;
+- (void)cleanOAuthTokenInfo;
+
 @end

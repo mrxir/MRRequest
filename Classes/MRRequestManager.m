@@ -525,12 +525,33 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
     return tokenState;
 }
 
-#pragma mark - private method
-
-+ (void)cleanUserDefaults
+- (void)cleanOAuthUserDefaults
 {
-    
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults removeObjectForKey:@"client_id"];
+    [userDefaults removeObjectForKey:@"client_secret"];
+    [userDefaults removeObjectForKey:@"oAuthResultInfo"];
+    [userDefaults removeObjectForKey:@"access_token"];
+    [userDefaults removeObjectForKey:@"refresh_token"];
+    [userDefaults removeObjectForKey:@"expires_in"];
+    [userDefaults removeObjectForKey:@"access_token_storage_date"];
+    [userDefaults removeObjectForKey:@"refresh_token_storage_date"];
+    [userDefaults synchronize];
 }
+
+- (void)cleanOAuthTokenInfo
+{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults removeObjectForKey:@"oAuthResultInfo"];
+    [userDefaults removeObjectForKey:@"access_token"];
+    [userDefaults removeObjectForKey:@"refresh_token"];
+    [userDefaults removeObjectForKey:@"expires_in"];
+    [userDefaults removeObjectForKey:@"access_token_storage_date"];
+    [userDefaults removeObjectForKey:@"refresh_token_storage_date"];
+    [userDefaults synchronize];
+}
+
+#pragma mark - private method
 
 + (void)setValue:(id)value class:(Class)aClass forKey:(NSString *)key
 {
@@ -652,7 +673,7 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
         NSLog(@"[OAUTH] 🔘 Execute framework refresh_token invalid plan.");
     }
     
-    [MROAuthRequestManager cleanUserDefaults];
+    [self cleanOAuthTokenInfo];
 }
 
 - (void)executeCustomPresetPlanForAccessTokenAbnormal
