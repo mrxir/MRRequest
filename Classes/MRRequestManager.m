@@ -514,7 +514,6 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
             
             // 两者失效
             if (tokenState == MROAuthTokenStateBothInvalid) {
-                [self freezeOAuthStatePeriodicCheckTimer];
                 [self executeFrameworkPresetPlanForRefreshTokenAbnormal];
                 [self executeCustomPresetPlanForRefreshTokenAbnormal];
             }
@@ -647,6 +646,8 @@ CGFloat const kRefreshTokenDurabilityRate = 1.0f;
 
 - (void)executeFrameworkPresetPlanForRefreshTokenAbnormal
 {
+    [self freezeOAuthStatePeriodicCheckTimer];
+    
     if ([MRRequestManager defaultManager].logLevel <= MRRequestLogLevelDebug) {
         NSLog(@"[OAUTH] 🔘 Execute framework refresh_token invalid plan.");
     }
