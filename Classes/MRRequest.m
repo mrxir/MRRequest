@@ -668,7 +668,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
             
         } else if (self.parameter.oAuthRequestScope == MRRequestParameterOAuthRequestScopeOrdinaryBusiness) {
             
-            if ([oAuthErrorCode isEqualToString:@"unknown_oauth_error"]
+            if ([oAuthErrorCode isEqualToString:@"unknown_oauth_error_code"]
                 || [oAuthErrorCode isEqualToString:@"access_denied"]
                 || [oAuthErrorCode isEqualToString:@"error_uri"]
                 || [oAuthErrorCode isEqualToString:@"invalid_request"]
