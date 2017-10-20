@@ -259,7 +259,7 @@
             NSMutableDictionary *encodeParam = [NSMutableDictionary dictionary];
             
             [validJSONObjectOrString enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
-                encodeParam[key] = [obj URLEncode];
+                encodeParam[key] = [[NSString stringWithFormat:@"%@", obj] URLEncode];
             }];
             
             validJSONObjectOrString = encodeParam;
