@@ -18,6 +18,8 @@
 
 #import <UIView+Toast.h>
 
+#import <AdSupport/AdSupport.h>
+
 @interface AppDelegate ()
 
 @end
@@ -42,38 +44,51 @@
     
     [CSToastManager setQueueEnabled:NO];
     [CSToastManager setDefaultPosition:CSToastPositionBottom];
+    
+    NSDictionary *deviceInfo = @{@"appBundleIdentifier": [[NSBundle mainBundle] bundleIdentifier],
+                                 @"appVersion"         : [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"],
+                                 @"deviceSystemVersion": [[UIDevice currentDevice] systemVersion],
+                                 @"deviceSerialNumber" : [[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString],
+                                 @"deviceModel"        : [[UIDevice currentDevice] model],
+                                 @"deviceName"         : [[UIDevice currentDevice] name],
+                                 @"devicePlatform"     : @"1"};
+    
+    NSLog(@"%@", deviceInfo);
 
-    [MRRequest setCustomAdditionalParameter:@{@"appBundleIdentifier": @"com.taigesiit.test",
-                                              @"appVersion"         : @"1.0.0",
-                                              @"deviceSystemVersion": @"8.0",
-                                              @"deviceSerialNumber" : @"0000-0000-0000-0000",
-                                              @"deviceModel"        : @"iPhone X",
-                                              @"devicePlatform"     : @"1"}];
+    [MRRequest setCustomAdditionalParameter:deviceInfo];
 
     [MRRequest setLogLevel:MRRequestLogLevelVerbose];
     
     NSError *error = nil;
-    [MRRequest enableOAuthRequestWithServer:@"https://test-appif.chejianding.com:10000/oauth/token?"
+    [MRRequest enableOAuthRequestWithServer:@"http://10.0.40.119:8080/oauth/token?"
                                    clientId:@"ff2ff059d245ae8cb378ab54a92e966d"
                                clientSecret:@"01f32ac28d7b45e08932f11a958f1d9f"
-                   autodestructTimeInterval:300.0f
+                   autodestructTimeInterval:2592000.0f
                                    anyError:&error];
     
     [MRRequest setOAuthStatePeriodicCheckTimeInterval:1];
     [MRRequest setOAuthStatePeriodicCheckEnabled:YES];
     
     [MRRequest setOAuthAccessTokenAbnormalCustomPlanBlock:^{
+        
         NSLog(@"我是自定义access_token失效预案方法");
+        
+        [SVProgressHUD showInfoWithStatus:@"access_token 已失效"];
+        
     } replaceOrKeepBoth:NO];
     
     [MRRequest setOAuthRefreshTokenAbnormalCustomPlanBlock:^{
         
+        [SVProgressHUD showInfoWithStatus:@"refresh_token 已失效"];
+        
+        /*
         UIViewController *top = [[self rootViewController] topViewController];
         
         if (![top isKindOfClass:[AccountLoginController class]]) {
             UIViewController *vc = [AccountLoginController matchControllerForMyself];
             [[self rootViewController] pushViewController:vc animated:YES];
         }
+         */
         
     } replaceOrKeepBoth:NO];
     
@@ -103,7 +118,8 @@
     
     [UIStoryboard setStoryboardNames:@[@"Main",
                                        @"OAuthRequest",
-                                       @"CommonRequest"]];
+                                       @"CommonRequest",
+                                       @"ApplicationSimulate"]];
     
     [SVProgressHUD setMinimumSize:CGSizeMake(100.0f, 100.0f)];
     

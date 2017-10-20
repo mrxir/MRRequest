@@ -53,6 +53,7 @@
     [self.view endEditing:YES];
 }
 
+#pragma mark - <自动填写>
 - (void)didClickFillItem:(UIBarButtonItem *)item
 {
     NSDateFormatter *timestampDateFormatter = [[NSDateFormatter alloc] init];
@@ -63,9 +64,10 @@
     
     self.oauth_client_id.text = [MROAuthRequestManager defaultManager].client_id;
     self.oauth_client_secret.text = [MROAuthRequestManager defaultManager].client_secret;
-    self.oauth_grant_type.text = @"password";
+    //self.oauth_grant_type.text = @"password";
+    self.oauth_grant_type.text = @"smscode";
     
-    self.oauth_username.text = @"abc123";
+    self.oauth_username.text = @"15201118210";
     self.oauth_password.text = @"123456";
     
     self.oauth_format.text = @"json";
@@ -90,6 +92,7 @@
     
     self.oauthInfo[@"format"]           = self.oauth_format.text;
     self.oauthInfo[@"timestamp"]        = self.oauth_timestamp.text;
+    self.oauthInfo[@"client_type"]      = @"1";
     
     // 签名
     NSString *sign = self.oauthInfo.formattedIntoFormStyleString.md5Hash;

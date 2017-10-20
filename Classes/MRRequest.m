@@ -700,6 +700,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
         }
         
         NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+        userInfo[@"oAuthErrorCode"] = oAuthErrorCode;
         userInfo[NSURLPathKey] = self.URL;
         userInfo[NSLocalizedDescriptionKey] = NSLocalizedString(requestErrorDesc, nil);
         userInfo[NSLocalizedFailureReasonErrorKey] = NSLocalizedString(oAuthErrorCodeDesc, nil);

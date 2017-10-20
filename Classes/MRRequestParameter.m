@@ -15,6 +15,8 @@
 #import <MRFramework/NSString+Extension.h>
 #import <MRFramework/NSJSONSerialization+Extension.h>
 
+#import "NSString+URLEncode.h"
+
 @interface MRRequestParameter ()
 {
     NSDateFormatter *_timestampDateFormatter;
@@ -254,6 +256,13 @@
             
             validJSONObjectOrString[@"sign"] = [self encryptWithSHA1:sign];
             
+            NSMutableDictionary *encodeParam = [NSMutableDictionary dictionary];
+            
+            [validJSONObjectOrString enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+                encodeParam[key] = [obj URLEncode];
+            }];
+            
+            validJSONObjectOrString = encodeParam;
         }
         
     }

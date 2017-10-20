@@ -16,6 +16,8 @@
 
 #import <UIView+Toast.h>
 
+#import "NSString+URLEncode.h"
+
 @interface QueryVehicleIdentifierController ()
 
 @property (nonatomic, strong) NSMutableDictionary *queryInfo;
@@ -69,9 +71,15 @@
 
 - (void)updateMapAndUI
 {
+    
+    NSString *vin = self.vehicleIdentifier.text;
+    
+    //vin = [vin URLEncode];
+    
+    NSLog(@"%@", vin);
+    
     // insert map
-    self.queryInfo[@"vin"] = self.vehicleIdentifier.text;
-    self.queryInfo[@"vinSource"] = @"1";
+    self.queryInfo[@"vin"] = vin;
     
 }
 
@@ -79,20 +87,22 @@
 {
     [self updateMapAndUI];
     
-    NSString *path = @"https://test-appif.chejianding.com:10000/api/home/homeIndex?";
+    NSString *path = @"http://10.0.40.119:8080/api/v1/feeset/list?";
     
-    MRRequestParameter *parameter = [[MRRequestParameter alloc] initWithObject:nil];
+    MRRequestParameter *parameter = [[MRRequestParameter alloc] initWithObject:self.queryInfo];
     
     parameter.oAuthIndependentSwitchState = YES;
     parameter.oAuthRequestScope = MRRequestParameterOAuthRequestScopeOrdinaryBusiness;
     parameter.formattedStyle = MRRequestParameterFormattedStyleForm;
     parameter.requestMethod = MRRequestParameterRequestMethodPost;
     
+    NSLog(@"%@", [parameter.structure stringWithUTF8]);
+    
     [SVProgressHUD showWithStatus:@"查询中..."];
     
     [MRRequest requestWithPath:path parameter:parameter success:^(MRRequest *request, id receiveObject) {
         
-        [SVProgressHUD dismissWithDelay:1];
+        [SVProgressHUD dismiss];
         
         self.resultTextView.text = [NSString stringWithFormat:@"%@", [receiveObject stringWithUTF8]];
         

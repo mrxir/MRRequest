@@ -81,7 +81,7 @@
     // insert map
     self.loginInfo[@"username"]         = self.username.text;
     self.loginInfo[@"password"]         = self.password.text;
-    self.loginInfo[@"login_type"]       = @"0",
+    //self.loginInfo[@"login_type"]       = @"0",
     self.loginInfo[@"client_type"]      = @"1";
     
 }
@@ -113,7 +113,7 @@
                 });
             });
             [SVProgressHUD dismissWithDelay:3 completion:^{
-                [self.navigationController popViewControllerAnimated:YES];
+                //[self.navigationController popViewControllerAnimated:YES];
             }];
         });
         

@@ -45,6 +45,12 @@
 					<key>description</key>
 					<string>OAuth2.0 错误码处理演示</string>
 				</dict>
+				<dict>
+					<key>identifier</key>
+					<string>ApplicationSimulate</string>
+					<key>description</key>
+					<string>应用程序模拟</string>
+				</dict>
 			</array>
 		</dict>
 		<dict>
