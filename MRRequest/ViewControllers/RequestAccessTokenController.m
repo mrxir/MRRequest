@@ -64,8 +64,7 @@
     
     self.oauth_client_id.text = [MROAuthRequestManager defaultManager].client_id;
     self.oauth_client_secret.text = [MROAuthRequestManager defaultManager].client_secret;
-    //self.oauth_grant_type.text = @"password";
-    self.oauth_grant_type.text = @"smscode";
+    self.oauth_grant_type.text = @"password";
     
     self.oauth_username.text = @"15201118210";
     self.oauth_password.text = @"123456";
@@ -126,12 +125,8 @@
         
         self.resultTextView.text = error.description;
         
-        if (error.code == MRRequestErrorCodeEqualRequestError) {
-            [self.view makeToast:error.localizedDescription];
-        } else {
-            [SVProgressHUD showErrorWithStatus:error.localizedDescription];
-        }
-                
+        [MRRequest handleError:error];
+        
     }];
     
 }

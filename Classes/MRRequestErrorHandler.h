@@ -13,6 +13,8 @@
  
  - MRRequestErrorCodeEqualRequestError:                 重复请求
  
+ - MRRequestErrorCodeOAuthDeviceInit:                   OAuth授权获取时初始化设备
+ - MRRequestErrorCodeOAuthNoMobile:                     OAuth授权获取时无手机号
  - MRRequestErrorCodeOAuthRequestError:                 OAuth授权获取时发生错误
  - MRRequestErrorCodeOAuthRenewalError:                 OAuth授权续约时发生错误
  
@@ -26,6 +28,8 @@ typedef NS_ENUM(NSUInteger, MRRequestErrorCode) {
     
     MRRequestErrorCodeEqualRequestError                 = 7782222,
     
+    MRRequestErrorCodeOAuthDeviceInit                   = 7782300,
+    MRRequestErrorCodeOAuthNoMobile                     = 7782301,
     MRRequestErrorCodeOAuthRequestError                 = 7782400,
     MRRequestErrorCodeOAuthRenewalError                 = 7782401,
     

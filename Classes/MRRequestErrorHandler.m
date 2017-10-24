@@ -60,6 +60,8 @@
     NSDictionary *handleBlockInfo = [MRRequestErrorHandler defaultManager].handleBlockInfo;
     
     NSArray *fixedCodes = @[@(MRRequestErrorCodeEqualRequestError),
+                            @(MRRequestErrorCodeOAuthDeviceInit),
+                            @(MRRequestErrorCodeOAuthNoMobile),
                             @(MRRequestErrorCodeOAuthRequestError),
                             @(MRRequestErrorCodeOAuthRenewalError),
                             @(MRRequestErrorCodeOAuthCommonRequestLightlyError),

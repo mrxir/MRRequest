@@ -97,6 +97,14 @@
     } forErrorCode:MRRequestErrorCodeEqualRequestError];
     
     [MRRequest setHandleBlock:^{
+        [SVProgressHUD showInfoWithStatus:@"新设备登录，需要二次验证。"];
+    } forErrorCode:MRRequestErrorCodeOAuthDeviceInit];
+    
+    [MRRequest setHandleBlock:^{
+        [SVProgressHUD showInfoWithStatus:@"未绑定手机号"];
+    } forErrorCode:MRRequestErrorCodeOAuthNoMobile];
+    
+    [MRRequest setHandleBlock:^{
         [SVProgressHUD showInfoWithStatus:@"登录失败, 用户名或密码错误."];
     } forErrorCode:MRRequestErrorCodeOAuthRequestError];
     

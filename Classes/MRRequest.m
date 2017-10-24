@@ -658,8 +658,22 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
         
         if (self.parameter.oAuthRequestScope == MRRequestParameterOAuthRequestScopeRequestAccessToken) {
             
-            requestErrorCode = MRRequestErrorCodeOAuthRequestError;
-            requestErrorDesc = [NSString stringWithFormat:@"OAuth获取授权的结果中捕获到异常, %@", oAuthErrorCodeDesc];
+            if ([oAuthErrorCode isEqualToString:@"new_device"]) {
+                
+                requestErrorCode = MRRequestErrorCodeOAuthDeviceInit;
+                requestErrorDesc = [NSString stringWithFormat:@"OAuth获取授权时需要初始化设备, %@", oAuthErrorCodeDesc];
+                
+            } else if ([oAuthErrorCode isEqualToString:@"no_mobile"]) {
+                
+                requestErrorCode = MRRequestErrorCodeOAuthNoMobile;
+                requestErrorDesc = [NSString stringWithFormat:@"OAuth获取授权时未找到手机号, %@", oAuthErrorCodeDesc];
+                
+            } else {
+                
+                requestErrorCode = MRRequestErrorCodeOAuthRequestError;
+                requestErrorDesc = [NSString stringWithFormat:@"OAuth获取授权的结果中捕获到异常, %@", oAuthErrorCodeDesc];
+                
+            }
             
         } else if (self.parameter.oAuthRequestScope == MRRequestParameterOAuthRequestScopeRefreshAccessToken) {
             
@@ -715,6 +729,7 @@ NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
             NSLog(@"[MRREQUEST] ❗️ 地址 %@", self.URL);
             NSLog(@"[MRREQUEST] ❗️ 参数 %@", self.parameter.object);
             NSLog(@"[MRREQUEST] ❗️ 错误 %@", oAuthErrorCodeDesc);
+            NSLog(@"[MRREQUEST] ❗️ 描述 %@", requestErrorDesc);
             
         }
         
