@@ -16,7 +16,7 @@
 
 #import <UIView+Toast.h>
 
-#import <NSString+Extension.h>
+#import <NSString+TangExtension.h>
 
 #import <NSDictionary+Extension.h>
 

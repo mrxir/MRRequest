@@ -10,13 +10,19 @@ DEPENDENCIES:
   - SVProgressHUD
   - Toast
 
+SPEC REPOS:
+  trunk:
+    - IQKeyboardManager
+    - SVProgressHUD
+    - Toast
+
 EXTERNAL SOURCES:
   MRFramework:
     :git: https://github.com/mrxir/MRFramework.git
 
 CHECKOUT OPTIONS:
   MRFramework:
-    :commit: 07fc287181cf237e4b6149dcabc2d778b0012eb4
+    :commit: b23a146998a3dd6152489d9ae64997f1f5fbec59
     :git: https://github.com/mrxir/MRFramework.git
 
 SPEC CHECKSUMS:
@@ -27,4 +33,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 33a126c84f35fb3edf288cf027e3b02fd9678b0f
 
-COCOAPODS: 1.2.1
+COCOAPODS: 1.9.3

@@ -11,10 +11,12 @@
 
 #import "NSObject+Extension.h"
 
-#import "NSString+Extension.h"
+#import "NSString+TangExtension.h"
 
 #import "NSJSONSerialization+Extension.h"
 
 #import "NSDictionary+Extension.h"
+
+#import "NSURL+Extension.h"
 
 #endif /* MRFoundation_h */

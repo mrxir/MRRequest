@@ -18,6 +18,16 @@
 
 @implementation NSObject (Property)
 
+- (void)_setObject:(id)object forKey:(NSString *)key
+{
+    objc_setAssociatedObject(self, (__bridge const void * _Nonnull)(key), object, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (id)_objectForKey:(NSString *)key
+{
+    return objc_getAssociatedObject(self, (__bridge const void * _Nonnull)(key));
+}
+
 @dynamic objectIndexPath;
 
 - (NSIndexPath *)objectIndexPath
@@ -28,6 +38,19 @@
 - (void)setObjectIndexPath:(NSIndexPath *)objectIndexPath
 {
     objc_setAssociatedObject(self, @"objectIndexPath", objectIndexPath, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+
+@dynamic objectKey;
+
+- (NSString *)objectKey
+{
+    return objc_getAssociatedObject(self, @"objectKey");
+}
+
+- (void)setObjectKey:(NSString *)objectKey
+{
+    objc_setAssociatedObject(self, @"objectKey", objectKey, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
 
 @end

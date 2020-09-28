@@ -11,7 +11,7 @@
 #import <MRFramework/UIStoryboard+Extension.h>
 #import <MRFramework/UIControl+Extension.h>
 #import <MRFramework/NSDictionary+Extension.h>
-#import <MRFramework/NSString+Extension.h>
+#import <MRFramework/NSString+TangExtension.h>
 #import <MRFramework/NSObject+Extension.h>
 
 #import <SVProgressHUD.h>

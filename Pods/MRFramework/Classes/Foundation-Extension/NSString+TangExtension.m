@@ -6,9 +6,9 @@
 //  Copyright © 2017年 MrXir. All rights reserved.
 //
 
-#import "NSString+Extension.h"
+#import "NSString+TangExtension.h"
 
-@implementation NSString (Extension)
+@implementation NSString (TangExtension)
 
 @end
 
@@ -36,6 +36,74 @@
     }
     
     return isValid;
+}
+
++ (BOOL)isNotEmpty:(id)obj
+{
+    BOOL isNotEmpty = NO;
+    
+    NSString *someString = (NSString *)obj;
+    
+    if ([someString respondsToSelector:@selector(isEqualToString:)]) {
+        if (![someString isEqualToString:@"nil"]
+            && ![someString isEqualToString:@"null"]
+            && ![someString isEqualToString:@"(null)"]
+            && ![someString isEqualToString:@"<null>"]
+            && [someString length] > 0) {
+            isNotEmpty = YES;
+        }
+    }
+    
+    return isNotEmpty;
+}
+
+- (void)detectForeignWordCompletion:(DetectForeignWordCompletion)detectCompletion
+{
+    [self enumerateSubstringsInRange:NSMakeRange(0, self.length) options:NSStringEnumerationByComposedCharacterSequences usingBlock:^(NSString * _Nullable substring, NSRange substringRange, NSRange enclosingRange, BOOL * _Nonnull stop) {
+        
+        NSString *match = @"(^[\u4e00-\u9fa5]+$)";
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF matches %@", match];
+        BOOL isChinese = [predicate evaluateWithObject:substring];
+        
+        if (!isChinese) {
+            
+            *stop = YES;
+            
+            if (detectCompletion != NULL) detectCompletion(YES, substring, substringRange);
+        }
+        
+    }];
+}
+
+- (NSString *)filterWithCharactersInString:(NSString *)characters
+{
+    NSScanner *scanner = [NSScanner scannerWithString:self];
+    
+    // Intermediate
+    NSMutableString *numberString = [NSMutableString string];
+    
+    NSCharacterSet *numbers = [NSCharacterSet characterSetWithCharactersInString:characters];
+    
+    NSString *tempStr;
+    
+    while (![scanner isAtEnd]) {
+        
+        // Throw away characters before the first number.
+        [scanner scanUpToCharactersFromSet:numbers intoString:NULL];
+        
+        // Collect numbers.
+        [scanner scanCharactersFromSet:numbers intoString:&tempStr];
+        
+        if (tempStr != nil) {
+            [numberString appendString:tempStr];
+        }
+        
+        tempStr = @"";
+    }
+    
+    // Result.
+    
+    return numberString;
 }
 
 @end
@@ -136,11 +204,13 @@
         if (option == CalculateOptionWidth) {
             maxSize = CGSizeMake(CGFLOAT_MAX, frame.size.height);
             boundingRect = [self boundingRectWithSize:maxSize options:opts attributes:attributes context:nil];
-            boundingRect.size.width += ceilf(boundingRect.size.width);
+            boundingRect.size.width = ceilf(boundingRect.size.width);
+            boundingRect.size.height = ceilf(boundingRect.size.height);
             
         } else {
             maxSize = CGSizeMake(frame.size.width, CGFLOAT_MAX);
             boundingRect = [self boundingRectWithSize:maxSize options:opts attributes:attributes context:nil];
+            boundingRect.size.width = ceilf(boundingRect.size.width);
             boundingRect.size.height = ceilf(boundingRect.size.height);
         }
         

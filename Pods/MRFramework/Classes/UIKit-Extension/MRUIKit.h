@@ -21,4 +21,6 @@
 
 #import "UINavigationBar+Extension.h"
 
+#import "UITextView+Extension.h"
+
 #endif /* MRUIKit_h */

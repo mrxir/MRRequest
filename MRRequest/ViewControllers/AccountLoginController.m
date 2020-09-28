@@ -10,7 +10,7 @@
 
 #import "MRRequest.h"
 
-#import <MRFramework/NSString+Extension.h>
+#import <MRFramework/NSString+TangExtension.h>
 #import <MRFramework/NSObject+Extension.h>
 
 #import <SVProgressHUD.h>

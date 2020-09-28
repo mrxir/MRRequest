@@ -8,13 +8,15 @@
 
 #import <Foundation/Foundation.h>
 
-@interface NSString (Extension)
+@interface NSString (TangExtension)
 
 @end
 
 
 
 #pragma mark - verify extension
+
+typedef void(^DetectForeignWordCompletion)(BOOL hasForeignWord, NSString *foreignWordText, NSRange foreignWordRange);
 
 /**
  verify extension
@@ -27,6 +29,12 @@
  @return BOOL
  */
 + (BOOL)isValidString:(id)obj;
+
++ (BOOL)isNotEmpty:(id)obj;
+
+- (void)detectForeignWordCompletion:(DetectForeignWordCompletion)detectCompletion;
+
+- (NSString *)filterWithCharactersInString:(NSString *)characters;
 
 @end
 

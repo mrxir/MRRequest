@@ -12,7 +12,7 @@
 
 #import <MRFramework/NSObject+Extension.h>
 #import <MRFramework/NSDictionary+Extension.h>
-#import <MRFramework/NSString+Extension.h>
+#import <MRFramework/NSString+TangExtension.h>
 #import <MRFramework/NSJSONSerialization+Extension.h>
 
 #import "NSString+URLEncode.h"

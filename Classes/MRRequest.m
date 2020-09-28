@@ -8,7 +8,7 @@
 
 #import "MRRequest.h"
 
-#import <MRFramework/NSString+Extension.h>
+#import <MRFramework/NSString+TangExtension.h>
 
 NSString * const MRRequestErrorDomain = @"MRRequestErrorDomain";
 

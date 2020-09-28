@@ -23,11 +23,22 @@
  */
 @interface NSObject (Property)
 
+- (void)_setObject:(id)object forKey:(NSString *)key;
+
+- (id)_objectForKey:(NSString *)key;
+
 @property (nonatomic, strong) NSIndexPath *objectIndexPath;
 
 - (NSIndexPath *)objectIndexPath;
 
 - (void)setObjectIndexPath:(NSIndexPath *)objectIndexPath;
+
+
+@property (nonatomic, copy) NSString *objectKey;
+
+- (NSString *)objectKey;
+
+- (void)setObjectKey:(NSString *)objectKey;
 
 @end
 
